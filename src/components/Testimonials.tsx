@@ -153,7 +153,7 @@ export function Testimonials() {
                   <span className="text-[10px] text-gray-400">11:42</span>
                 </div>
                 <p className="text-xs sm:text-sm text-[#111B21] leading-relaxed">
-                  &ldquo;Gente, deu super certo! 😍 Todo mundo achou que eu contratei um escritor particular haha. O padre até comentou no final que nunca tinha visto votos tão bem equilibrados. Valeu cada centavo dos 29 reais! Já indiquei pra 3 amigas que casam esse ano ❤️&rdquo;
+                  &ldquo;Gente, deu super certo! 😍 Todo mundo achou que eu contratei um escritor particular haha. O padre até comentou no final que nunca tinha visto votos tão bem equilibrados. Valeu cada centavo dos 47 reais! Já indiquei pra 3 amigas que casam esse ano ❤️&rdquo;
                 </p>
                 <div className="flex items-center justify-end gap-1 text-[10px] text-gray-400">
                   <span>11:42</span>

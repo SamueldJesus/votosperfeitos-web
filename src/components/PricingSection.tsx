@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Check, Sparkles, ShieldCheck, Zap, Gift, ArrowRight, Clock } from "lucide-react";
+import { Check, Sparkles, ShieldCheck, Zap, ArrowRight, Clock } from "lucide-react";
 
 interface PricingSectionProps {
   onOpenQuiz: () => void;
@@ -26,7 +26,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
           </h2>
 
           <p className="text-base sm:text-lg text-[#78716C] font-light leading-relaxed">
-            Três versões para escolher, PDF para imprimir e um guia para ensaiar. Tudo no mesmo pacote, sem assinatura.
+            Escolha o tom. Receba três variações inéditas e três PDFs por e-mail. Tudo no mesmo pacote, sem assinatura.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-2xl sm:text-3xl font-light text-[#78716C]">R$</span>
                 <span className="font-serif-luxury text-6xl sm:text-7xl font-bold text-[#1C1917] tracking-tight">
-                  29<span className="text-4xl sm:text-5xl font-normal text-[#B38E46]">,90</span>
+                  47<span className="text-4xl sm:text-5xl font-normal text-[#B38E46]">,00</span>
                 </span>
               </div>
 
@@ -71,7 +71,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Encontre o tom que combina com você.</strong> Receba versões emocionante, leve e clássica, criadas a partir das suas respostas.
+                    <strong>Escolha o tom que combina com você.</strong> Receba três variações inéditas dentro dele, criadas a partir das suas respostas.
                   </span>
                 </li>
 
@@ -89,7 +89,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Leve seus votos impressos.</strong> O PDF vem formatado para você imprimir no papel que preferir. Impressão não incluída.
+                    <strong>Receba 3 PDFs no seu e-mail.</strong> Você escolhe a sua versão favorita, ajusta se quiser e imprime no papel que preferir.
                   </span>
                 </li>
 
@@ -98,24 +98,10 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Leia com mais conforto no celular.</strong> Texto ampliado e pausas sinalizadas ajudam você a acompanhar a leitura.
+                    <strong>Compare com calma antes de decidir.</strong> As três variações chegam no mesmo tom para você encontrar a que parece mais sua.
                   </span>
                 </li>
 
-                {/* Exclusive Bonus */}
-                <li className="flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-[#C5A059]/40 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#B38E46] flex items-center justify-center text-white shrink-0 mt-0.5">
-                    <Gift className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="text-xs sm:text-sm">
-                    <span className="font-bold text-[#9C7836] uppercase tracking-wide text-[11px] block">
-                      TAMBÉM INCLUÍDO:
-                    </span>
-                    <span className="text-[#1C1917] font-medium">
-                      Mini-guia em PDF: <em>&ldquo;Como ensaiar seus votos e ler com mais tranquilidade no altar&rdquo;</em>.
-                    </span>
-                  </div>
-                </li>
               </ul>
             </div>
 
