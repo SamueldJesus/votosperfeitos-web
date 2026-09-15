@@ -41,11 +41,11 @@ npm run build
 npx wrangler deploy
 ```
 
-Enquanto `avancoai.com.br` usar DNS externo, valide em `https://votosperfeitos-web.progression-os.workers.dev`. Para usar `votoperfeito.avancoai.com.br`, primeiro migre a zona para a Cloudflare. Depois, acrescente ao `wrangler.toml` e faça novo deploy:
+Enquanto `avancoai.com.br` usar DNS externo, valide em `https://votosperfeitos-web.progression-os.workers.dev`. Para usar `votosperfeitos.avancoai.com.br`, primeiro migre a zona para a Cloudflare. Depois, acrescente ao `wrangler.toml` e faça novo deploy:
 
 ```toml
 [[routes]]
-pattern = "votoperfeito.avancoai.com.br"
+pattern = "votosperfeitos.avancoai.com.br"
 custom_domain = true
 ```
 

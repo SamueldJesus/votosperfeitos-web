@@ -4,7 +4,7 @@ compatibility_date = "2026-09-15"
 workers_dev = true
 
 [[routes]]
-pattern = "votoperfeito.avancoai.com.br"
+pattern = "votosperfeitos.avancoai.com.br"
 custom_domain = true
 
 [triggers]
