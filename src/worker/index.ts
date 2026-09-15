@@ -6,6 +6,11 @@ import { cleanupExpiredOrders } from "./retention";
 import { handleMercadoPagoWebhook } from "./webhook";
 
 async function handleCheckout(request: Request, env: Env): Promise<Response> {
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+  if (Number.isFinite(contentLength) && contentLength > 40_000) {
+    return json({ error: "Dados do pedido são muito grandes" }, 413);
+  }
+
   let input;
   try {
     input = parseCheckoutInput(await request.json());

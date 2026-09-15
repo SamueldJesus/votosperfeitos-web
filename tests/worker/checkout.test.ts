@@ -51,6 +51,21 @@ afterEach(() => {
 });
 
 describe("POST /api/checkout", () => {
+  it("rejects a checkout body larger than the accepted limit before parsing it", async () => {
+    const { env } = createEnv();
+    const response = await worker.fetch(
+      new Request("https://votosperfeitos.test/api/checkout", {
+        method: "POST",
+        headers: { "Content-Length": "40001" },
+        body: "x".repeat(40001),
+      }) as never,
+      env as never,
+    );
+
+    expect(response.status).toBe(413);
+    await expect(response.json()).resolves.toEqual({ error: "Dados do pedido são muito grandes" });
+  });
+
   it("creates a R$ 47,00 Pix Order and returns data for the in-page QR code", async () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(

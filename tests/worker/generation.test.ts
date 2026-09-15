@@ -40,6 +40,9 @@ describe("generateVows", () => {
 
     const requestBody = JSON.stringify(fetchSpy.mock.calls[0]?.[1]?.body);
     expect(requestBody).toContain("lagrimas");
+    const payload = JSON.parse(String(fetchSpy.mock.calls[0]?.[1]?.body));
+    const history = JSON.parse(payload.input[1].content);
+    expect(history.historia).not.toHaveProperty("email");
     expect(fetchSpy).toHaveBeenCalledWith(
       "https://api.openai.com/v1/responses",
       expect.objectContaining({ headers: expect.objectContaining({ Authorization: "Bearer openai-test" }) }),

@@ -106,7 +106,15 @@ export async function generateVows(env: Env, order: StoredOrder): Promise<Genera
           role: "user",
           content: JSON.stringify({
             tomSelecionado: order.tone,
-            historia: order.answers,
+            historia: {
+              quemFala: order.answers.who,
+              nomeDeQuemFala: order.answers.speakerName,
+              nomeDaPessoaAmada: order.answers.partnerName,
+              comoSeConheceram: order.answers.howMet,
+              lembrancaEspecial: order.answers.insideJoke,
+              momentoMarcante: order.answers.certainMoment,
+              promessa: order.answers.deepPromise,
+            },
           }),
         },
       ],
