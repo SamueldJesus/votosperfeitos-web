@@ -1,0 +1,6 @@
+# Copy to .dev.vars for `npx wrangler dev`. Fill locally; never commit credentials.
+OPENAI_API_KEY=
+MP_ACCESS_TOKEN=
+MP_WEBHOOK_SECRET=
+RESEND_API_KEY=
+EMAIL_FROM=

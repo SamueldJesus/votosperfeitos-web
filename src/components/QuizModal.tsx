@@ -1,412 +1,93 @@
 "use client";
 
 import React, { useState } from "react";
-import confetti from "canvas-confetti";
-import { X, ArrowRight, ArrowLeft, Sparkles, CheckCircle2, QrCode, ShieldCheck, Heart, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, LoaderCircle, ShieldCheck, X } from "lucide-react";
 
-interface QuizModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface QuizModalProps { isOpen: boolean; onClose: () => void; }
+type Tone = "lagrimas" | "sorrisos" | "classica";
+interface PixPayment { orderId: string; qrCode: string; qrCodeBase64: string; ticketUrl: string; }
+const fieldClass = "w-full p-4 text-sm rounded-2xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059] leading-relaxed";
 
 export function QuizModal({ isOpen, onClose }: QuizModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    who: "noivo-noiva",
-    names: { speaker: "", partner: "" },
-    howMet: "",
-    insideJoke: "",
-    certainMoment: "",
-    primaryTone: "lagrimas",
-    deepPromise: ""
-  });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationPhase, setGenerationPhase] = useState("");
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [copiedPix, setCopiedPix] = useState(false);
+  const [formData, setFormData] = useState({ email: "", who: "noivo-noiva", speakerName: "", partnerName: "", howMet: "", insideJoke: "", certainMoment: "", tone: "lagrimas" as Tone, deepPromise: "" });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pixPayment, setPixPayment] = useState<PixPayment | null>(null);
+  const [copied, setCopied] = useState(false);
+  const totalSteps = 6;
 
   if (!isOpen) return null;
 
-  const totalSteps = 6;
+  const validateStep = () => {
+    const missing = (currentStep === 1 && (!formData.email.trim() || !formData.speakerName.trim() || !formData.partnerName.trim())) || (currentStep === 2 && !formData.howMet.trim()) || (currentStep === 3 && !formData.insideJoke.trim()) || (currentStep === 4 && !formData.certainMoment.trim()) || (currentStep === 6 && !formData.deepPromise.trim());
+    if (missing) { setError("Preencha este campo para continuar."); return false; }
+    if (currentStep === 1 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) { setError("Informe um e-mail válido para receber seus PDFs."); return false; }
+    setError(""); return true;
+  };
+
+  const startCheckout = async () => {
+    if (!validateStep()) return;
+    setIsSubmitting(true); setError("");
+    try {
+      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+      const result = (await response.json()) as { payment?: PixPayment; error?: string };
+      if (response.status !== 201 || !result.payment) throw new Error(result.error || "Não foi possível iniciar o pagamento. Tente novamente.");
+      setPixPayment(result.payment);
+      setIsSubmitting(false);
+    } catch (checkoutError) {
+      setError(checkoutError instanceof Error ? checkoutError.message : "Não foi possível iniciar o pagamento. Tente novamente.");
+      setIsSubmitting(false);
+    }
+  };
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      triggerGeneration();
+    if (!validateStep()) return;
+    if (currentStep === totalSteps) void startCheckout(); else setCurrentStep((step) => step + 1);
+  };
+  const setText = (name: "howMet" | "insideJoke" | "certainMoment" | "deepPromise") => (value: string) => setFormData({ ...formData, [name]: value });
+
+  const copyPixCode = async () => {
+    if (!pixPayment) return;
+    try {
+      await navigator.clipboard.writeText(pixPayment.qrCode);
+      setCopied(true);
+    } catch {
+      setError("Não foi possível copiar automaticamente. Selecione o código e copie.");
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+  const closeModal = () => {
+    setCurrentStep(1);
+    setPixPayment(null);
+    setCopied(false);
+    setError("");
+    onClose();
   };
 
-  const triggerGeneration = () => {
-    setIsGenerating(true);
-    setGenerationPhase("Preparando o próximo passo...");
+  if (pixPayment) {
+    return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"><div className="relative w-full max-w-xl rounded-3xl border border-[#F0EAE1] bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-[#F0EAE1] bg-[#FAF8F5] px-6 py-4"><span className="text-xs font-bold uppercase tracking-widest text-[#1C1917]">Sua história, seus votos</span><button onClick={closeModal} className="p-1.5 text-[#78716C] hover:text-[#1C1917] cursor-pointer" aria-label="Fechar modal"><X className="w-5 h-5" /></button></div><div className="space-y-5 p-6 text-center sm:p-8"><div className="space-y-2"><h3 className="font-serif-luxury text-3xl font-bold text-[#1C1917]">Seu Pix está pronto</h3><p className="text-sm text-[#78716C]">Pague R$ 47,00 pelo app do seu banco. Assim que o pagamento for confirmado, enviaremos seus 3 PDFs por e-mail.</p></div><img src={`data:image/jpeg;base64,${pixPayment.qrCodeBase64}`} alt="QR Code Pix" className="mx-auto h-52 w-52 rounded-2xl border border-[#F0EAE1] bg-white p-3" /><div className="space-y-2 text-left"><label htmlFor="pix-code" className="block text-xs font-semibold text-[#1C1917]">Pix Copia e Cola</label><textarea id="pix-code" readOnly value={pixPayment.qrCode} rows={3} className={`${fieldClass} resize-none bg-[#FAF8F5]`} /><button type="button" onClick={() => void copyPixCode()} className="w-full rounded-full border border-[#C5A059] px-5 py-3 text-sm font-semibold text-[#6F4E1F] hover:bg-[#FAF8F5] cursor-pointer">{copied ? "Código copiado" : "Copiar código Pix"}</button></div><a href={pixPayment.ticketUrl} target="_blank" rel="noreferrer" className="inline-block text-sm font-semibold text-[#8F6D32] underline underline-offset-4">Abrir Pix no Mercado Pago</a><p className="text-xs text-[#78716C]">Mantenha esta tela aberta até concluir o pagamento.</p>{error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}</div></div></div>;
+  }
 
-    setTimeout(() => {
-      setGenerationPhase("Reunindo as informações do seu pacote...");
-    }, 1200);
-
-    setTimeout(() => {
-      setGenerationPhase("Quase lá. Confira o que está incluído.");
-    }, 2400);
-
-    setTimeout(() => {
-      setIsGenerating(false);
-      setIsCompleted(true);
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#C5A059", "#B38E46", "#E8D5CE", "#FAF8F5"]
-      });
-    }, 3600);
-  };
-
-  const copyPixKey = () => {
-    navigator.clipboard.writeText("00020126580014br.gov.bcb.pix0136votosperfeitos-pix-key-2990520400005303986540529.905802BR5915VOTOSPERFEITOS6009SAO PAULO62070503***6304E8A2");
-    setCopiedPix(true);
-    setTimeout(() => setCopiedPix(false), 2500);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl sm:rounded-[32px] border border-[#F0EAE1] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        
-        {/* Modal Top Bar */}
-        <div className="px-6 py-4 border-b border-[#F0EAE1] flex items-center justify-between bg-[#FAF8F5]">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#B38E46]" />
-            <span className="text-xs uppercase tracking-widest font-bold text-[#1C1917]">
-              Sua história, seus votos
-            </span>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-[#78716C] hover:text-[#1C1917] hover:bg-white transition-colors cursor-pointer"
-            aria-label="Fechar modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Progress Bar (if not completed) */}
-        {!isCompleted && !isGenerating && (
-          <div className="w-full bg-[#F0EAE1] h-1.5">
-            <div
-              className="bg-gradient-to-r from-[#B38E46] to-[#C5A059] h-1.5 transition-all duration-300"
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            />
-          </div>
-        )}
-
-        {/* Modal Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-          
-          {/* STATE 1: GENERATING SPINNER */}
-          {isGenerating && (
-            <div className="py-12 flex flex-col items-center justify-center text-center space-y-6">
-              <div className="relative w-16 h-16">
-                <div className="absolute inset-0 rounded-full border-4 border-[#F0EAE1] border-t-[#B38E46] animate-spin" />
-                <div className="absolute inset-2 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#B38E46]">
-                  <Sparkles className="w-6 h-6 animate-pulse" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                  Vamos dar forma à sua história
-                </h4>
-                <p className="text-xs sm:text-sm text-[#78716C] max-w-sm mx-auto font-light">
-                  {generationPhase}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* STATE 2: COMPLETED & READY FOR INSTANT PIX CHECKOUT */}
-          {isCompleted && (
-            <div className="space-y-6 text-center animate-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 rounded-full bg-[#F7F1E5] border border-[#C5A059] mx-auto flex items-center justify-center text-[#B38E46]">
-                <CheckCircle2 className="w-9 h-9" />
-              </div>
-
-              <div className="space-y-1.5">
-                <h3 className="font-serif-luxury text-3xl font-bold text-[#1C1917]">
-                  Seu próximo passo: receber seus votos
-                </h3>
-                <p className="text-sm text-[#78716C] max-w-md mx-auto">
-                  O pacote inclui <strong>3 versões a partir das suas respostas</strong> e <strong>PDF para imprimir</strong>. Confira os detalhes antes de pagar.
-                </p>
-              </div>
-
-              {/* Offer recap card */}
-              <div className="bg-[#FAF8F5] rounded-2xl p-5 border border-[#F0EAE1] text-left space-y-3">
-                <div className="flex items-center justify-between border-b border-[#F0EAE1] pb-3">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#B38E46]">
-                    Seu pacote completo
-                  </span>
-                  <span className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    R$ 29,90
-                  </span>
-                </div>
-
-                <ul className="text-xs text-[#1C1917] space-y-2">
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#B38E46]">✓</span> 3 estilos para escolher o que combina com você
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#B38E46]">✓</span> PDF formatado para imprimir e levar ao altar
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#B38E46]">✓</span> Mini-guia para ensaiar e ler com mais tranquilidade
-                  </li>
-                </ul>
-              </div>
-
-              {/* Pix Payment Action */}
-              <div className="space-y-3">
-                <button
-                  onClick={copyPixKey}
-                  className="w-full bg-[#1C1917] hover:bg-[#292524] text-white py-4 px-6 rounded-full font-semibold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-all"
-                >
-                  <QrCode className="w-5 h-5 text-[#C5A059]" />
-                  <span>{copiedPix ? "Código Pix copiado" : "Copiar Pix de R$ 29,90"}</span>
-                </button>
-
-                <p className="text-[11px] text-[#78716C] flex items-center justify-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#B38E46]" />
-                  Pagamento único • Garantia de 7 dias
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* STATE 3: INTERACTIVE 6 QUESTIONS STEP-BY-STEP */}
-          {!isCompleted && !isGenerating && (
-            <div className="space-y-6">
-              
-              {/* Step indicator text */}
-              <div className="flex items-center justify-between text-xs text-[#78716C]">
-                <span className="font-semibold text-[#B38E46]">
-                  Pergunta {currentStep} de {totalSteps}
-                </span>
-                <span>Responda do seu jeito</span>
-              </div>
-
-              {/* STEP 1 */}
-              {currentStep === 1 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    Quem vai ler os votos e para quem?
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { id: "noivo-noiva", label: "Noivo falando para Noiva" },
-                      { id: "noiva-noivo", label: "Noiva falando para Noivo" },
-                      { id: "noivo-noivo", label: "Noivo falando para Noivo" },
-                      { id: "noiva-noiva", label: "Noiva falando para Noiva" }
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, who: opt.id })}
-                        className={`p-3.5 rounded-2xl border text-xs sm:text-sm font-medium transition-all text-left cursor-pointer ${
-                          formData.who === opt.id
-                            ? "border-[#C5A059] bg-[#FAF8F5] text-[#1C1917] font-semibold shadow-sm"
-                            : "border-[#F0EAE1] hover:border-gray-300 text-[#78716C]"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1C1917] mb-1">
-                        Seu nome ou apelido
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ex: Rafael"
-                        value={formData.names.speaker}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            names: { ...formData.names, speaker: e.target.value }
-                          })
-                        }
-                        className="w-full px-4 py-2.5 text-sm rounded-xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1C1917] mb-1">
-                        Nome de quem você ama
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ex: Mariana"
-                        value={formData.names.partner}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            names: { ...formData.names, partner: e.target.value }
-                          })
-                        }
-                        className="w-full px-4 py-2.5 text-sm rounded-xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 2 */}
-              {currentStep === 2 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    Como começou a história de vocês?
-                  </h3>
-                  <p className="text-xs text-[#78716C]">
-                    Onde vocês se conheceram? O que você lembra daquele dia? Frases simples já ajudam.
-                  </p>
-                  <textarea
-                    rows={4}
-                    placeholder="Ex: Foi num sábado chuvoso em 2021 numa padaria da esquina. Ele derramou café na camisa e eu achei fofo o jeito desajeitado dele..."
-                    value={formData.howMet}
-                    onChange={(e) => setFormData({ ...formData, howMet: e.target.value })}
-                    className="w-full p-4 text-sm rounded-2xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059] leading-relaxed resize-none"
-                  />
-                </div>
-              )}
-
-              {/* STEP 3 */}
-              {currentStep === 3 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    Que detalhe do dia a dia faz você sorrir?
-                  </h3>
-                  <p className="text-xs text-[#78716C]">
-                    Pode ser uma mania, uma piada interna ou um pequeno gesto de carinho. Escolha algo que gostaria de contar no altar.
-                  </p>
-                  <textarea
-                    rows={4}
-                    placeholder="Ex: Ela rouba as batatas fritas do meu prato fingindo que não quer nada, e maratona séries dormindo no terceiro episódio..."
-                    value={formData.insideJoke}
-                    onChange={(e) => setFormData({ ...formData, insideJoke: e.target.value })}
-                    className="w-full p-4 text-sm rounded-2xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059] leading-relaxed resize-none"
-                  />
-                </div>
-              )}
-
-              {/* STEP 4 */}
-              {currentStep === 4 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    Quando você sentiu que queria uma vida a dois?
-                  </h3>
-                  <p className="text-xs text-[#78716C]">
-                    Pense em um gesto de apoio, uma conversa ou um dia comum. Se não houve um momento exato, conte o que faz você escolher essa pessoa.
-                  </p>
-                  <textarea
-                    rows={4}
-                    placeholder="Ex: Quando fiquei doente e ele cancelou os planos para cuidar de mim e preparar sopa, ou quando olhei para ele numa terça-feira comum e senti paz..."
-                    value={formData.certainMoment}
-                    onChange={(e) => setFormData({ ...formData, certainMoment: e.target.value })}
-                    className="w-full p-4 text-sm rounded-2xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059] leading-relaxed resize-none"
-                  />
-                </div>
-              )}
-
-              {/* STEP 5 */}
-              {currentStep === 5 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    Qual estilo combina mais com você?
-                  </h3>
-                  <p className="text-xs text-[#78716C]">
-                    Essa é só a sua preferência. As três versões estão incluídas no pacote.
-                  </p>
-                  <div className="space-y-2.5">
-                    {[
-                      { id: "lagrimas", title: "Lágrimas e Coração", desc: "Carinho, gratidão e o que vocês viveram" },
-                      { id: "sorrisos", title: "Sorrisos e Cumplicidade", desc: "Romance, manias e um toque de humor" },
-                      { id: "classica", title: "Clássica e Atemporal", desc: "Um texto mais breve, com foco nas promessas" }
-                    ].map((t) => (
-                      <div
-                        key={t.id}
-                        onClick={() => setFormData({ ...formData, primaryTone: t.id })}
-                        className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                          formData.primaryTone === t.id
-                            ? "border-[#C5A059] bg-[#FAF8F5]"
-                            : "border-[#F0EAE1] hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-sm text-[#1C1917]">{t.title}</span>
-                          <span className="text-xs text-[#B38E46]">Selecionar</span>
-                        </div>
-                        <p className="text-xs text-[#78716C] mt-0.5">{t.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 6 */}
-              {currentStep === 6 && (
-                <div className="space-y-4">
-                  <h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">
-                    O que você quer prometer para a vida de vocês?
-                  </h3>
-                  <p className="text-xs text-[#78716C]">
-                    Pense no cuidado que quer ter todos os dias. Não precisa ser grandioso: precisa fazer sentido para você.
-                  </p>
-                  <textarea
-                    rows={4}
-                    placeholder="Ex: Prometo nunca soltar sua mão nos dias difíceis, ser seu primeiro abraço ao chegar em casa e te amar todos os dias com paciência e ternura..."
-                    value={formData.deepPromise}
-                    onChange={(e) => setFormData({ ...formData, deepPromise: e.target.value })}
-                    className="w-full p-4 text-sm rounded-2xl border border-[#F0EAE1] focus:outline-none focus:border-[#C5A059] leading-relaxed resize-none"
-                  />
-                </div>
-              )}
-
-              {/* Navigation Buttons inside Modal */}
-              <div className="pt-4 border-t border-[#F0EAE1] flex items-center justify-between">
-                {currentStep > 1 ? (
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-[#78716C] hover:text-[#1C1917] cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Voltar
-                  </button>
-                ) : (
-                  <div />
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="bg-[#1C1917] hover:bg-[#292524] text-white px-6 py-3 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md hover:shadow-lg cursor-pointer transition-all"
-                >
-                  <span>{currentStep === totalSteps ? "Ver meu pacote de R$ 29,90" : "Continuar"}</span>
-                  <ArrowRight className="w-4 h-4 text-[#C5A059]" />
-                </button>
-              </div>
-
-            </div>
-          )}
-
-        </div>
-
+  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="relative w-full max-w-xl bg-white rounded-3xl sm:rounded-[32px] border border-[#F0EAE1] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="px-6 py-4 border-b border-[#F0EAE1] flex items-center justify-between bg-[#FAF8F5]"><div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#B38E46]" /><span className="text-xs uppercase tracking-widest font-bold text-[#1C1917]">Sua história, seus votos</span></div><button onClick={closeModal} disabled={isSubmitting} className="p-1.5 rounded-full text-[#78716C] hover:text-[#1C1917] hover:bg-white transition-colors cursor-pointer disabled:opacity-50" aria-label="Fechar modal"><X className="w-5 h-5" /></button></div>
+      <div className="w-full bg-[#F0EAE1] h-1.5"><div className="bg-gradient-to-r from-[#B38E46] to-[#C5A059] h-1.5 transition-all duration-300" style={{ width: `${(currentStep / totalSteps) * 100}%` }} /></div>
+      <div className="p-6 sm:p-8 overflow-y-auto flex-1 space-y-6">
+        <div className="flex items-center justify-between text-xs text-[#78716C]"><span className="font-semibold text-[#B38E46]">Pergunta {currentStep} de {totalSteps}</span><span>Responda do seu jeito</span></div>
+        {currentStep === 1 && <div className="space-y-4"><h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">Quem vai ler os votos e para quem?</h3><div className="grid grid-cols-2 gap-3">{[["noivo-noiva", "Noivo falando para Noiva"], ["noiva-noivo", "Noiva falando para Noivo"], ["noivo-noivo", "Noivo falando para Noivo"], ["noiva-noiva", "Noiva falando para Noiva"]].map(([id, label]) => <button key={id} type="button" onClick={() => setFormData({ ...formData, who: id })} className={`p-3.5 rounded-2xl border text-xs sm:text-sm font-medium transition-all text-left cursor-pointer ${formData.who === id ? "border-[#C5A059] bg-[#FAF8F5] text-[#1C1917] font-semibold shadow-sm" : "border-[#F0EAE1] hover:border-gray-300 text-[#78716C]"}`}>{label}</button>)}</div><div><label htmlFor="buyer-email" className="block text-xs font-semibold text-[#1C1917] mb-1">Seu e-mail para receber os PDFs</label><input id="buyer-email" type="email" value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} className={fieldClass} placeholder="voce@email.com" /></div><div className="grid grid-cols-2 gap-3"><Field id="speaker-name" label="Seu nome ou apelido" value={formData.speakerName} onChange={(speakerName) => setFormData({ ...formData, speakerName })} /><Field id="partner-name" label="Nome de quem você ama" value={formData.partnerName} onChange={(partnerName) => setFormData({ ...formData, partnerName })} /></div></div>}
+        {currentStep === 2 && <Question label="Como vocês se conheceram" help="Onde vocês se conheceram? Frases simples já ajudam." value={formData.howMet} onChange={setText("howMet")} />}
+        {currentStep === 3 && <Question label="Uma lembrança só de vocês" help="Conte uma mania, uma piada interna ou um pequeno gesto de carinho." value={formData.insideJoke} onChange={setText("insideJoke")} />}
+        {currentStep === 4 && <Question label="Um momento que confirmou esse amor" help="Pode ser um gesto de apoio, uma conversa ou um dia comum." value={formData.certainMoment} onChange={setText("certainMoment")} />}
+        {currentStep === 5 && <div className="space-y-4"><h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">Qual tom você quer dar aos seus votos?</h3><p className="text-xs text-[#78716C]">Você receberá 3 variações inéditas dentro desse mesmo tom.</p>{[{ id: "lagrimas", title: "Lágrimas e Coração", desc: "Carinho, gratidão e o que vocês viveram" }, { id: "sorrisos", title: "Sorrisos e Cumplicidade", desc: "Romance, manias e um toque de humor" }, { id: "classica", title: "Clássica e Atemporal", desc: "Um texto mais breve, com foco nas promessas" }].map((tone) => <button key={tone.id} type="button" onClick={() => setFormData({ ...formData, tone: tone.id as Tone })} className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all ${formData.tone === tone.id ? "border-[#C5A059] bg-[#FAF8F5]" : "border-[#F0EAE1] hover:border-gray-300"}`}><span className="font-semibold text-sm text-[#1C1917]">{tone.title}</span><span className="block text-xs text-[#78716C] mt-0.5">{tone.desc}</span></button>)}</div>}
+        {currentStep === 6 && <Question label="Uma promessa que vem do coração" help="Pense no cuidado que quer ter todos os dias." value={formData.deepPromise} onChange={setText("deepPromise")} />}
+        {error && <p role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
+        <div className="pt-4 border-t border-[#F0EAE1] flex items-center justify-between">{currentStep > 1 ? <button type="button" onClick={() => { setError(""); setCurrentStep((step) => step - 1); }} disabled={isSubmitting} className="flex items-center gap-1.5 text-xs font-semibold text-[#78716C] hover:text-[#1C1917] cursor-pointer disabled:opacity-50"><ArrowLeft className="w-4 h-4" />Voltar</button> : <div />}<button type="button" onClick={handleNext} disabled={isSubmitting} className="bg-[#1C1917] hover:bg-[#292524] text-white px-6 py-3 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md cursor-pointer disabled:opacity-70">{isSubmitting ? <><LoaderCircle className="w-4 h-4 animate-spin text-[#C5A059]" />Gerando Pix...</> : <><span>{currentStep === totalSteps ? "Gerar Pix de R$ 47,00" : "Continuar"}</span><ArrowRight className="w-4 h-4 text-[#C5A059]" /></>}</button></div>
+        <p className="text-[11px] text-[#78716C] flex items-center justify-center gap-1.5"><ShieldCheck className="w-4 h-4 text-[#B38E46]" />Pagamento único via Pix • entrega por e-mail</p>
       </div>
     </div>
-  );
+  </div>;
 }
+
+function Field({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) { return <div><label htmlFor={id} className="block text-xs font-semibold text-[#1C1917] mb-1">{label}</label><input id={id} type="text" value={value} onChange={(event) => onChange(event.target.value)} className={fieldClass} /></div>; }
+function Question({ label, help, value, onChange }: { label: string; help: string; value: string; onChange: (value: string) => void }) { const id = label.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-"); return <div className="space-y-4"><h3 className="font-serif-luxury text-2xl font-bold text-[#1C1917]">{label}</h3><p className="text-xs text-[#78716C]">{help}</p><label htmlFor={id} className="sr-only">{label}</label><textarea id={id} rows={4} value={value} onChange={(event) => onChange(event.target.value)} className={`${fieldClass} resize-none`} /></div>; }

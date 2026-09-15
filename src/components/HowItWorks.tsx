@@ -25,27 +25,27 @@ export function HowItWorks({ onOpenQuiz }: HowItWorksProps) {
     {
       step: "02",
       icon: Cpu,
-      title: "Encontre o seu jeito de dizer",
-      subtitle: "3 estilos no mesmo pacote",
+      title: "Escolha o tom que parece com você",
+      subtitle: "3 variações no mesmo tom",
       description:
-        "A IA organiza suas respostas em três versões: emocionante, leve e clássica. Você escolhe a que combina mais com você e ajusta as palavras antes de ler no altar.",
+        "Você escolhe o tom e a IA transforma suas respostas em três variações inéditas dentro dele, para você decidir qual quer levar ao altar.",
       bullets: [
         "Memórias, sentimentos e promessas",
-        "Três opções para comparar",
+        "Três variações no tom escolhido",
         "Pausas indicadas no texto"
       ]
     },
     {
       step: "03",
       icon: FileText,
-      title: "Prepare-se para ler no altar",
-      subtitle: "Texto + PDF + guia de leitura",
+      title: "Receba seu pacote por e-mail",
+      subtitle: "3 PDFs prontos para imprimir",
       description:
-        "Com a versão escolhida, leia em voz alta e dê seu toque final. O pacote inclui PDF para imprimir e orientações para você ensaiar com mais tranquilidade.",
+        "Assim que o pagamento for aprovado, você recebe três PDFs no e-mail informado para ler, ajustar e levar ao altar.",
       bullets: [
         "PDF pronto para imprimir",
-        "Letras grandes no modo celular",
-        "Guia para ensaiar e fazer pausas"
+        "Três opções para escolher com calma",
+        "Entrega no e-mail informado"
       ]
     }
   ];
@@ -66,7 +66,7 @@ export function HowItWorks({ onOpenQuiz }: HowItWorksProps) {
           </h2>
 
           <p className="text-base sm:text-lg text-[#78716C] font-light leading-relaxed">
-            Comece pelas 6 perguntas. O pacote com as 3 versões e o PDF custa R$ 29,90, em pagamento único.
+            Comece pelas 6 perguntas. O pacote com 3 variações no tom escolhido e 3 PDFs por e-mail custa R$ 47,00, em pagamento único.
           </p>
         </div>
 

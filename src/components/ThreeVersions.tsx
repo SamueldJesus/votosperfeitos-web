@@ -97,11 +97,11 @@ Receba hoje o meu amor inteiro, sem reservas e sem pressa. Prometo honrar nossa 
           </div>
 
           <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-medium text-[#1C1917] tracking-tight">
-            Três versões da sua história. <span className="italic text-[#B38E46]">Qual tem mais a sua cara?</span>
+            Escolha o tom da sua história. <span className="italic text-[#B38E46]">Receba três variações dele.</span>
           </h2>
 
           <p className="text-base sm:text-lg text-[#78716C] font-light leading-relaxed">
-            Mais emoção, um toque de humor ou poucas palavras? As três versões estão incluídas. Veja os exemplos e descubra qual estilo combina com você.
+            Mais emoção, um toque de humor ou poucas palavras? Veja os exemplos, escolha um tom e receba três variações inéditas dentro dele.
           </p>
         </div>
 

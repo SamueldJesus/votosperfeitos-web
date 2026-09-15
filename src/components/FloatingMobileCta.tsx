@@ -36,7 +36,7 @@ export function FloatingMobileCta({ onOpenQuiz }: FloatingMobileCtaProps) {
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#78716C]">Por</span>
-            <span className="text-sm font-bold text-[#B38E46]">R$ 29,90</span>
+            <span className="text-sm font-bold text-[#B38E46]">R$ 47,00</span>
           </div>
         </div>
 

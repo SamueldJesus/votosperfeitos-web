@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VotosPerfeitos
 
-## Getting Started
+Landing page e fluxo de compra para três variações de votos de casamento no tom escolhido. O navegador coleta a história, exibe o QR Code Pix criado pelo Mercado Pago e, após uma confirmação autenticada, o Worker gera os textos, cria três PDFs e os envia para o e-mail do comprador.
 
-First, run the development server:
+## Desenvolvimento
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm test
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Para executar o Worker com os endpoints `/api/*`, copie `.dev.vars.example` para `.dev.vars`, preencha os valores apenas na sua máquina e rode:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx wrangler dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O `npm run dev` serve somente a interface Next.js; ele não inclui D1, R2, Queue nem os endpoints de pagamento.
 
-## Learn More
+## Configuração Cloudflare
 
-To learn more about Next.js, take a look at the following resources:
+Crie os recursos na conta que fará a publicação:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx wrangler d1 create votosperfeitos-orders
+npx wrangler r2 bucket create votosperfeitos-files
+npx wrangler queues create votosperfeitos-vow-jobs
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Copie o ID retornado pelo D1 para `database_id` em `wrangler.toml`. Depois aplique o esquema e inclua os segredos no ambiente remoto:
 
-## Deploy on Vercel
+```bash
+npx wrangler d1 migrations apply votosperfeitos-orders --remote
+npx wrangler secret put OPENAI_API_KEY
+npx wrangler secret put MP_ACCESS_TOKEN
+npx wrangler secret put MP_WEBHOOK_SECRET
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put EMAIL_FROM
+npm run build
+npx wrangler deploy
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Enquanto `avancoai.com.br` usar DNS externo, valide em `https://votosperfeitos-web.progression-os.workers.dev`. Para usar `votoperfeito.avancoai.com.br`, primeiro migre a zona para a Cloudflare. Depois, acrescente ao `wrangler.toml` e faça novo deploy:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```toml
+[[routes]]
+pattern = "votoperfeito.avancoai.com.br"
+custom_domain = true
+```
+
+Não inclua valores de segredos em `wrangler.toml`, Git ou no cliente.
+
+## Teste de pagamento
+
+1. No Mercado Pago, configure Checkout Transparente com API Orders, Pix e o evento `Order (Mercado Pago)`. Use a URL de notificação `https://SEU-DOMINIO/api/webhooks/mercado-pago`.
+2. No Resend, verifique o domínio usado em `EMAIL_FROM`; isso permite enviar e-mails ao comprador fora da lista de teste.
+3. Faça uma compra Pix de sandbox e confirme que o pedido chega a `sent` no D1, que a fila teve um trabalho e que o e-mail contém três PDFs.
+4. Publique em produção somente depois de esse fluxo funcionar de ponta a ponta.
+
+O Worker cria uma Order Pix de R$ 47,00 com uma chave de idempotência por pedido. O QR Code e o código copia e cola são exibidos no modal; cartões não fazem parte deste fluxo.
+
+## Dados e reprocessamento
+
+Os PDFs ficam no R2 em `orders/<orderId>/` sem URL pública. Cada e-mail usa uma chave de idempotência baseada no pedido. A fila faz até três tentativas antes de marcar uma entrega como falha. O Cron diário do Worker remove PDFs e registros de pedidos com mais de 30 dias, em lotes de 100.

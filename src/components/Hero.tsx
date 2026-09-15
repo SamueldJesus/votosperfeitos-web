@@ -34,7 +34,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg lg:text-xl text-[#78716C] leading-relaxed max-w-2xl font-light">
-              Transforme as memórias de vocês em <strong className="font-semibold text-[#1C1917]">3 versões de votos de casamento</strong>, com ajuda de IA. Responda 6 perguntas, escolha seu estilo e dê seu toque final.
+              Escolha o tom que mais parece com você. Receba <strong className="font-semibold text-[#1C1917]">3 variações inéditas nesse mesmo tom</strong>, criadas a partir da história de vocês e enviadas por e-mail.
             </p>
 
             {/* Main CTA Block */}
@@ -51,7 +51,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
 
               {/* Zero Friction Subtext */}
               <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-[#78716C] pt-1">
-                <span className="font-medium text-[#B38E46]">3 versões + PDF por R$ 29,90</span>
+                <span className="font-medium text-[#B38E46]">3 variações + 3 PDFs por R$ 47,00</span>
                 <span className="text-[#C5A059]">•</span>
                 <span>Pagamento único</span>
                 <span className="text-[#C5A059]">•</span>

@@ -17,7 +17,7 @@ export function FaqSection() {
     },
     {
         "question": "Recebo as três versões ou preciso escolher uma antes?",
-        "answer": "O pacote de R$ 29,90 inclui as três versões: Lágrimas e Coração, Sorrisos e Cumplicidade e Clássica e Atemporal. A preferência no formulário ajuda a indicar seu tom. Você pode comparar os textos e escolher depois."
+        "answer": "Você escolhe entre Lágrimas e Coração, Sorrisos e Cumplicidade ou Clássica e Atemporal. O pacote de R$ 47,00 inclui 3 versões inéditas dentro do tom que você escolher."
     },
     {
         "question": "Posso mudar o texto antes do casamento?",
@@ -37,7 +37,7 @@ export function FaqSection() {
     },
     {
         "question": "É uma assinatura? E se eu não gostar dos votos?",
-        "answer": "É um pagamento único de R$ 29,90 via Pix, sem mensalidade. Se os textos não representarem a história de vocês, você pode pedir o reembolso integral em até 7 dias após a compra."
+        "answer": "É um pagamento único de R$ 47,00 via Pix, sem mensalidade. Se os textos não representarem a história de vocês, você pode pedir o reembolso integral em até 7 dias após a compra."
     }
 ];
 

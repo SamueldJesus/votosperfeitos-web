@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://votosperfeitos.com.br"),
   title: "Votos de casamento com a sua história | VotosPerfeitos",
   description:
-    "Transforme suas memórias em 3 versões de votos de casamento com ajuda de IA. Responda 6 perguntas e dê seu toque final. Pacote com PDF por R$ 29,90.",
+    "Transforme suas memórias em 3 versões de votos de casamento com ajuda de IA. Responda 6 perguntas e dê seu toque final. Pacote com PDF por R$ 47,00.",
   keywords: [
     "votos de casamento",
     "gerador de votos com ia",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Você sente tanto. Encontre as palavras para dizer no altar.",
     description:
-      "Suas memórias em três estilos de votos de casamento. Escolha o que combina com você e dê seu toque final. Pacote com PDF por R$ 29,90.",
+      "Suas memórias em três versões de votos de casamento no tom que você escolher. Pacote com PDF por R$ 47,00.",
     url: "https://votosperfeitos.com.br",
     siteName: "VotosPerfeitos Web",
     images: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Votos de casamento com a sua história | VotosPerfeitos",
     description:
-      "Conte a história de vocês em 6 perguntas. Três versões de votos e PDF para imprimir, por R$ 29,90 em pagamento único.",
+      "Conte a história de vocês em 6 perguntas. Três versões de votos e PDF para imprimir, por R$ 47,00 em pagamento único.",
     images: ["/images/hero-groom-altar.jpg"]
   },
   robots: {

@@ -1,0 +1,32 @@
+name = "votosperfeitos-web"
+main = "src/worker/index.ts"
+compatibility_date = "2026-09-15"
+workers_dev = true
+
+[[routes]]
+pattern = "votoperfeito.avancoai.com.br"
+custom_domain = true
+
+[triggers]
+crons = ["0 3 * * *"]
+
+[assets]
+directory = "./out"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "ORDERS"
+database_name = "votosperfeitos-orders"
+database_id = "967938ca-43f4-4448-b80d-ce0b045e2afe"
+
+[[r2_buckets]]
+binding = "VOW_FILES"
+bucket_name = "votosperfeitos-files"
+
+[[queues.producers]]
+binding = "VOW_JOBS"
+queue = "votosperfeitos-vow-jobs"
+
+[[queues.consumers]]
+queue = "votosperfeitos-vow-jobs"
