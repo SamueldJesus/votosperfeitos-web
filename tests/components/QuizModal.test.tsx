@@ -55,6 +55,10 @@ describe("QuizModal", () => {
       partnerName: "João",
     });
     expect(await screen.findByRole("heading", { name: "Seu Pix está pronto" })).not.toBeNull();
+    const pixModal = screen.getByTestId("pix-payment-modal");
+    expect(pixModal.className).toContain("max-h-[calc(100dvh-2rem)]");
+    expect(pixModal.className).toContain("overflow-y-auto");
+    expect(screen.getByAltText("QR Code Pix").className).toContain("sm:h-52");
     expect(screen.getByAltText("QR Code Pix").getAttribute("src")).toBe("data:image/jpeg;base64,aGVsbG8=");
     expect(screen.getByDisplayValue("pix-copy-paste")).not.toBeNull();
     expect(screen.getByRole("link", { name: "Abrir Pix no Mercado Pago" }).getAttribute("href")).toBe("https://mercadopago.test/pix");
