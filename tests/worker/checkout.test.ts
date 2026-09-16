@@ -142,3 +142,36 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toEqual({ error: "Não foi possível iniciar o pagamento agora" });
   });
 });
+
+describe("Meta checkout tracking", () => {
+  it("sends CAPI InitiateCheckout after a Pix order is successfully created", async () => {
+    vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        id: "ORD-123",
+        transactions: { payments: [{ id: "PAY-123", payment_method: { qr_code: "pix", qr_code_base64: "aGVsbG8=", ticket_url: "https://mercadopago.test/pix" } }] },
+      }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
+    const { env } = createEnv();
+    Object.assign(env, { META_PIXEL_ID: "pixel-123", META_CAPI_ACCESS_TOKEN: "capi-token" });
+
+    const response = await worker.fetch(
+      new Request("https://votosperfeitos.avancoai.com.br/api/checkout", {
+        method: "POST",
+        headers: { "user-agent": "test-agent", "cf-connecting-ip": "198.51.100.5" },
+        body: JSON.stringify({
+          ...checkoutInput,
+          tracking: { eventId: "b9a01abe-343f-41f4-b0e7-112233445566", fbp: "fb.1.1700000000.123456" },
+        }),
+      }) as never,
+      env as never,
+    );
+
+    expect(response.status).toBe(201);
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      2,
+      "https://graph.facebook.com/v24.0/pixel-123/events",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});

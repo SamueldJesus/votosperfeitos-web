@@ -13,6 +13,11 @@ export interface CheckoutInput {
   certainMoment: string;
   deepPromise: string;
   tone: Tone;
+  tracking?: {
+    eventId: string;
+    fbp?: string;
+    fbc?: string;
+  };
 }
 
 export interface GeneratedVow {

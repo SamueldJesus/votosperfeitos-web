@@ -21,6 +21,8 @@ function createEnv(status = "pending") {
     amount_cents: 4700,
     status,
     mercado_pago_order_id: "ORD-123",
+    email: "ana@example.com",
+    tracking_json: JSON.stringify({ fbp: "fb.1.1700000000.123456" }),
   };
 
   return {
@@ -133,7 +135,7 @@ describe("handleMercadoPagoWebhook", () => {
     expect(queueSend).not.toHaveBeenCalled();
   });
 
-  it("re-enqueues a confirmed order that is already paid after an earlier queue failure", async () => {
+  it("does not queue a confirmed order again when Mercado Pago replays a paid webhook", async () => {
     const { env, queueSend } = createEnv("paid");
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({
@@ -147,6 +149,26 @@ describe("handleMercadoPagoWebhook", () => {
     });
 
     await expect(handleMercadoPagoWebhook(request, env as never)).resolves.toMatchObject({ status: 200 });
-    expect(queueSend).toHaveBeenCalledWith({ orderId: "order-123" });
+    expect(queueSend).not.toHaveBeenCalled();
+  });
+
+  it("sends one server-verified Purchase after a successful Pix transition", async () => {
+    const { env, queueSend, statements } = createEnv();
+    Object.assign(env, { META_PIXEL_ID: "pixel-123", META_CAPI_ACCESS_TOKEN: "capi-token" });
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
+      }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
+    const request = new Request("https://votosperfeitos.test/api/webhooks/mercado-pago?data.id=ORD-123", {
+      method: "POST", headers: signedHeaders("ORD-123", "request-123", "webhook-secret"),
+    });
+
+    await expect(handleMercadoPagoWebhook(request, env as never)).resolves.toMatchObject({ status: 200 });
+
+    expect(queueSend).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenNthCalledWith(2, "https://graph.facebook.com/v24.0/pixel-123/events", expect.objectContaining({ method: "POST" }));
+    expect(statements.some((statement) => statement.sql.includes("meta_purchase_sent_at"))).toBe(true);
   });
 });

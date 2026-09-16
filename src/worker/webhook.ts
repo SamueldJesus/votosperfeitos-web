@@ -1,5 +1,6 @@
 import type { Env } from "./env";
 import { ORDER_AMOUNT_CENTS } from "./orders";
+import { sendMetaEvent } from "./meta";
 
 interface MercadoPagoOrder {
   id?: string;
@@ -114,35 +115,69 @@ export async function handleMercadoPagoWebhook(request: Request, env: Env): Prom
     }
 
     const order = await env.ORDERS.prepare(
-      "SELECT id, amount_cents, status, mercado_pago_order_id FROM orders WHERE id = ?",
+      "SELECT id, email, tracking_json, amount_cents, status, mercado_pago_order_id FROM orders WHERE id = ?",
     )
       .bind(orderId)
-      .first<{ id: string; amount_cents: number; status: string; mercado_pago_order_id: string | null }>();
+      .first<{
+        id: string;
+        email: string;
+        tracking_json: string;
+        amount_cents: number;
+        status: string;
+        mercado_pago_order_id: string | null;
+      }>();
 
     if (
       !order ||
       order.amount_cents !== ORDER_AMOUNT_CENTS ||
       order.mercado_pago_order_id !== dataId ||
-      !["pending", "paid"].includes(order.status)
+      order.status !== "pending"
     ) {
       return new Response(null, { status: 200 });
     }
 
-    if (order.status === "pending") {
-      const update = await env.ORDERS.prepare(
-        `UPDATE orders
-         SET status = 'paid', mercado_pago_payment_id = ?, paid_at = ?, updated_at = ?
-         WHERE id = ? AND status = 'pending' AND mercado_pago_order_id = ? AND mercado_pago_payment_id IS NULL`,
-      )
-        .bind(String(payment.id ?? dataId), new Date().toISOString(), new Date().toISOString(), orderId, dataId)
-        .run();
+    const paidAt = new Date().toISOString();
+    const update = await env.ORDERS.prepare(
+      `UPDATE orders
+       SET status = 'paid', mercado_pago_payment_id = ?, paid_at = ?, updated_at = ?
+       WHERE id = ? AND status = 'pending' AND mercado_pago_order_id = ? AND mercado_pago_payment_id IS NULL`,
+    )
+      .bind(String(payment.id ?? dataId), paidAt, paidAt, orderId, dataId)
+      .run();
 
-      if (update.meta.changes !== 1) {
-        return new Response(null, { status: 200 });
-      }
+    if (update.meta.changes !== 1) {
+      return new Response(null, { status: 200 });
     }
 
     await env.VOW_JOBS.send({ orderId });
+
+    let tracking: { fbp?: string; fbc?: string } = {};
+    try {
+      tracking = JSON.parse(order.tracking_json) as { fbp?: string; fbc?: string };
+    } catch {
+      // Historic orders do not contain tracking data.
+    }
+
+    const metaSent = await sendMetaEvent(env, {
+      eventName: "Purchase",
+      eventId: `purchase_${orderId}`,
+      eventTime: Math.floor(new Date(paidAt).getTime() / 1000),
+      eventSourceUrl: "https://votosperfeitos.avancoai.com.br/",
+      email: order.email,
+      orderId,
+      fbp: tracking.fbp,
+      fbc: tracking.fbc,
+      value: ORDER_AMOUNT_CENTS / 100,
+      currency: "BRL",
+    });
+
+    if (metaSent) {
+      await env.ORDERS.prepare(
+        "UPDATE orders SET meta_purchase_sent_at = ? WHERE id = ? AND meta_purchase_sent_at IS NULL",
+      )
+        .bind(new Date().toISOString(), orderId)
+        .run();
+    }
 
     return new Response(null, { status: 200 });
   } catch {

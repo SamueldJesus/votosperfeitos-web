@@ -4,3 +4,7 @@ MP_ACCESS_TOKEN=
 MP_WEBHOOK_SECRET=
 RESEND_API_KEY=
 EMAIL_FROM=
+META_PIXEL_ID=
+META_CAPI_ACCESS_TOKEN=
+# Optional: use only while validating events in Meta Events Manager.
+META_TEST_EVENT_CODE=

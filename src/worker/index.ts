@@ -4,6 +4,7 @@ import { createCheckout, parseCheckoutInput } from "./orders";
 import { handleVowMessage } from "./queue";
 import { cleanupExpiredOrders } from "./retention";
 import { handleMercadoPagoWebhook } from "./webhook";
+import { retryPendingMetaPurchases } from "./meta";
 
 async function handleCheckout(request: Request, env: Env): Promise<Response> {
   const contentLength = Number(request.headers.get("content-length") ?? 0);
@@ -19,7 +20,11 @@ async function handleCheckout(request: Request, env: Env): Promise<Response> {
   }
 
   try {
-    const result = await createCheckout(env, input);
+    const result = await createCheckout(env, input, {
+      sourceUrl: request.headers.get("origin") ?? new URL(request.url).origin,
+      ip: request.headers.get("cf-connecting-ip") ?? undefined,
+      userAgent: request.headers.get("user-agent") ?? undefined,
+    });
     return json({
       orderId: result.orderId,
       payment: {
@@ -54,12 +59,19 @@ export default {
       return handleMercadoPagoWebhook(request, env);
     }
 
+    if (url.pathname === "/api/meta/config") {
+      if (request.method !== "GET") return json({ error: "Método não permitido" }, 405);
+      return new Response(JSON.stringify({ pixelId: env.META_PIXEL_ID || null }), {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300" },
+      });
+    }
+
     return env.ASSETS.fetch(request);
   },
   async queue(batch, env): Promise<void> {
     await Promise.all(batch.messages.map((message) => handleVowMessage(message, env)));
   },
   async scheduled(_event, env): Promise<void> {
-    await cleanupExpiredOrders(env);
+    await Promise.all([cleanupExpiredOrders(env), retryPendingMetaPurchases(env)]);
   },
 } satisfies ExportedHandler<Env>;

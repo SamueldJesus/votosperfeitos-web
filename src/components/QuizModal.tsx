@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, ArrowRight, LoaderCircle, ShieldCheck, X } from "lucide-react";
+import { createCheckoutTracking, trackInitiateCheckout } from "./MetaPixel";
 
 interface QuizModalProps { isOpen: boolean; onClose: () => void; }
 type Tone = "lagrimas" | "sorrisos" | "classica";
@@ -30,9 +31,11 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     if (!validateStep()) return;
     setIsSubmitting(true); setError("");
     try {
-      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+      const tracking = createCheckoutTracking();
+      const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...formData, ...(tracking ? { tracking } : {}) }) });
       const result = (await response.json()) as { payment?: PixPayment; error?: string };
       if (response.status !== 201 || !result.payment) throw new Error(result.error || "Não foi possível iniciar o pagamento. Tente novamente.");
+      trackInitiateCheckout(tracking);
       setPixPayment(result.payment);
       setIsSubmitting(false);
     } catch (checkoutError) {

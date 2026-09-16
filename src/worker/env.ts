@@ -8,4 +8,7 @@ export interface Env {
   MP_WEBHOOK_SECRET: string;
   RESEND_API_KEY: string;
   EMAIL_FROM: string;
+  META_PIXEL_ID: string;
+  META_CAPI_ACCESS_TOKEN: string;
+  META_TEST_EVENT_CODE?: string;
 }

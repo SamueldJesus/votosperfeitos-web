@@ -1,6 +1,7 @@
 import type { Env } from "./env";
 import { createPixOrder, type MercadoPagoPixPayment } from "./mercado-pago";
 import { TONES, type CheckoutInput, type Tone } from "./types";
+import { parseMetaTracking, sendMetaEvent } from "./meta";
 
 export const ORDER_AMOUNT_CENTS = 4700;
 
@@ -52,6 +53,7 @@ export function parseCheckoutInput(value: unknown): CheckoutInput {
     throw new Error("E-mail inválido");
   }
 
+  const tracking = parseMetaTracking(input.tracking);
   return {
     email,
     who: readText(input, "who"),
@@ -62,6 +64,7 @@ export function parseCheckoutInput(value: unknown): CheckoutInput {
     certainMoment: readText(input, "certainMoment"),
     deepPromise: readText(input, "deepPromise"),
     tone: readTone(input.tone),
+    ...(tracking ? { tracking } : {}),
   };
 }
 
@@ -72,19 +75,21 @@ export function createOrderId(): string {
 export async function createCheckout(
   env: Env,
   input: CheckoutInput,
+  requestContext: { sourceUrl: string; ip?: string; userAgent?: string },
 ): Promise<{ orderId: string; payment: MercadoPagoPixPayment }> {
   const orderId = createOrderId();
   const now = new Date().toISOString();
 
   await env.ORDERS.prepare(
     `INSERT INTO orders (
-      id, email, answers_json, tone, amount_cents, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, email, answers_json, tracking_json, tone, amount_cents, status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       orderId,
       input.email,
-      JSON.stringify(input),
+      JSON.stringify({ ...input, tracking: undefined }),
+      JSON.stringify(input.tracking ? { fbp: input.tracking.fbp, fbc: input.tracking.fbc } : {}),
       input.tone,
       ORDER_AMOUNT_CENTS,
       "pending",
@@ -104,6 +109,23 @@ export async function createCheckout(
   )
     .bind(payment.orderId, new Date().toISOString(), orderId)
     .run();
+
+  if (input.tracking) {
+    await sendMetaEvent(env, {
+      eventName: "InitiateCheckout",
+      eventId: input.tracking.eventId,
+      eventTime: Math.floor(Date.now() / 1000),
+      eventSourceUrl: requestContext.sourceUrl,
+      email: input.email,
+      orderId,
+      fbp: input.tracking.fbp,
+      fbc: input.tracking.fbc,
+      ip: requestContext.ip,
+      userAgent: requestContext.userAgent,
+      value: ORDER_AMOUNT_CENTS / 100,
+      currency: "BRL",
+    });
+  }
 
   return { orderId, payment };
 }

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://votosperfeitos.com.br"),
@@ -75,6 +76,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#FAF8F5] text-[#1C1917] antialiased selection:bg-[#F7F1E5] selection:text-[#9C7836]">
         {children}
+        <MetaPixel />
       </body>
     </html>
   );
