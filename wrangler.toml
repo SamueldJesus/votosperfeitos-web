@@ -5,6 +5,7 @@ workers_dev = false
 
 [vars]
 EMAIL_FROM = "VotosPerfeitos <oi@avancoai.com.br>"
+META_PIXEL_ID = "1819313279240682"
 
 [[routes]]
 pattern = "votosperfeitos.avancoai.com.br"
