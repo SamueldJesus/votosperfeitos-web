@@ -3,7 +3,7 @@ import { errorResponse, json } from "./http";
 import { createCheckout, parseCheckoutInput } from "./orders";
 import { handleVowMessage } from "./queue";
 import { cleanupExpiredOrders } from "./retention";
-import { handleMercadoPagoWebhook } from "./webhook";
+import { handleMercadoPagoWebhook, reconcilePendingPixOrders } from "./webhook";
 import { retryPendingMetaPurchases } from "./meta";
 
 async function handleCheckout(request: Request, env: Env): Promise<Response> {
@@ -72,6 +72,6 @@ export default {
     await Promise.all(batch.messages.map((message) => handleVowMessage(message, env)));
   },
   async scheduled(_event, env): Promise<void> {
-    await Promise.all([cleanupExpiredOrders(env), retryPendingMetaPurchases(env)]);
+    await Promise.all([cleanupExpiredOrders(env), retryPendingMetaPurchases(env), reconcilePendingPixOrders(env)]);
   },
 } satisfies ExportedHandler<Env>;

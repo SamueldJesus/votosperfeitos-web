@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { handleMercadoPagoWebhook } from "../../src/worker/webhook";
+import { handleMercadoPagoWebhook, reconcilePendingPixOrders } from "../../src/worker/webhook";
 
 function signedHeaders(dataId: string, requestId: string, secret: string) {
   const timestamp = "1742505638683";
@@ -38,6 +38,7 @@ function createEnv(status = "pending") {
               return statement;
             },
             first: async () => (sql.startsWith("SELECT") ? pendingOrder : null),
+            all: async () => ({ results: [{ mercado_pago_order_id: "ORD-123" }] }),
             run: async () => ({ success: true, meta: { changes: 1 } }),
           };
           statements.push(statement);
@@ -170,5 +171,19 @@ describe("handleMercadoPagoWebhook", () => {
     expect(queueSend).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenNthCalledWith(2, "https://graph.facebook.com/v24.0/pixel-123/events", expect.objectContaining({ method: "POST" }));
     expect(statements.some((statement) => statement.sql.includes("meta_purchase_sent_at"))).toBe(true);
+  });
+
+  it("recovers a confirmed Pix when its webhook notification was missed", async () => {
+    const { env, queueSend } = createEnv();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
+      }), { status: 200 }),
+    );
+
+    await reconcilePendingPixOrders(env as never);
+
+    expect(queueSend).toHaveBeenCalledWith({ orderId: "order-123" });
   });
 });
