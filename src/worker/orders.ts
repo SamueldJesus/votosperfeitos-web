@@ -15,6 +15,7 @@ const requiredFields = {
   howMet: "Como vocês se conheceram",
   insideJoke: "Uma lembrança só de vocês",
   certainMoment: "Um momento que confirmou esse amor",
+  admiration: "O que você mais admira nessa pessoa",
   deepPromise: "Uma promessa que vem do coração",
 } as const;
 
@@ -62,6 +63,7 @@ export function parseCheckoutInput(value: unknown): CheckoutInput {
     howMet: readText(input, "howMet"),
     insideJoke: readText(input, "insideJoke"),
     certainMoment: readText(input, "certainMoment"),
+    admiration: readText(input, "admiration"),
     deepPromise: readText(input, "deepPromise"),
     tone: readTone(input.tone),
     ...(tracking ? { tracking } : {}),

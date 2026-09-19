@@ -3,9 +3,9 @@ import { handleVowMessage, processVowJob } from "../../src/worker/queue";
 
 const generated = {
   variations: [
-    { id: "1", title: "Nossa história", subtitle: "Uma narrativa", body: "Nossa história começou em uma padaria." },
-    { id: "2", title: "Minhas promessas", subtitle: "Compromissos", body: "Prometo escolher você todos os dias." },
-    { id: "3", title: "Do coração", subtitle: "Leitura íntima", body: "Meu amor, a nossa vida é feita de gestos." },
+    { id: "1", title: "Nossa história", subtitle: "Uma narrativa", body: "João, nossa história começou em uma padaria e ganhou forma nos detalhes que só a gente entende. [pausa breve] Eu lembro da chave esquecida, dos risos depois do susto e do cuidado que apareceu quando eu precisei de você. Naquele dia em que você cuidou de mim, eu entendi que amor também é presença simples, dessas que ficam mesmo quando ninguém está vendo. Eu admiro sua calma, seu cuidado e a maneira como você torna a vida mais leve. Prometo caminhar ao seu lado, ouvir antes de responder, cuidar da nossa casa e escolher você nos dias fáceis e nos difíceis. [respire] Hoje, diante de quem a gente ama, eu escolho continuar construindo essa vida com você." },
+    { id: "2", title: "Minhas promessas", subtitle: "Compromissos", body: "João, nossa história começou em uma padaria e ganhou forma nos detalhes que só a gente entende. [pausa breve] Eu lembro da chave esquecida, dos risos depois do susto e do cuidado que apareceu quando eu precisei de você. Naquele dia em que você cuidou de mim, eu entendi que amor também é presença simples, dessas que ficam mesmo quando ninguém está vendo. Eu admiro sua calma, seu cuidado e a maneira como você torna a vida mais leve. Prometo caminhar ao seu lado, ouvir antes de responder, cuidar da nossa casa e escolher você nos dias fáceis e nos difíceis. [respire] Hoje, diante de quem a gente ama, eu escolho continuar construindo essa vida com você. Prometo também proteger nossos planos e lembrar que o amor mora nas escolhas pequenas." },
+    { id: "3", title: "Do coração", subtitle: "Leitura íntima", body: "João, nossa história começou em uma padaria e ganhou forma nos detalhes que só a gente entende. [pausa breve] Eu lembro da chave esquecida, dos risos depois do susto e do cuidado que apareceu quando eu precisei de você. Naquele dia em que você cuidou de mim, eu entendi que amor também é presença simples, dessas que ficam mesmo quando ninguém está vendo. Eu admiro sua calma, seu cuidado e a maneira como você torna a vida mais leve. Prometo caminhar ao seu lado, ouvir antes de responder, cuidar da nossa casa e escolher você nos dias fáceis e nos difíceis. [respire] Hoje, diante de quem a gente ama, eu escolho continuar construindo essa vida com você. Que a nossa história continue sendo feita de verdade, cuidado e alegria." },
   ],
 };
 
@@ -23,6 +23,7 @@ function createEnv() {
     howMet: "Nos conhecemos em uma padaria.",
     insideJoke: "A chave de casa.",
     certainMoment: "Quando ele cuidou de mim.",
+    admiration: "Admiro o cuidado e a calma dele.",
     deepPromise: "Prometo caminhar ao seu lado.",
     tone: "lagrimas",
   };

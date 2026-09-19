@@ -9,6 +9,7 @@ const validInput = {
   howMet: "Nos conhecemos em uma padaria em um sábado de chuva.",
   insideJoke: "Ele sempre esquece a chave de casa.",
   certainMoment: "Quando ele cuidou de mim durante uma gripe.",
+  admiration: "Admiro a calma e o cuidado dele nos detalhes.",
   deepPromise: "Prometo caminhar ao seu lado nos dias bons e difíceis.",
   tone: "lagrimas",
 };
@@ -24,6 +25,7 @@ describe("parseCheckoutInput", () => {
 
   it("rejects missing story answers and unknown tones", () => {
     expect(() => parseCheckoutInput({ ...validInput, howMet: "" })).toThrow("Como vocês se conheceram");
+    expect(() => parseCheckoutInput({ ...validInput, admiration: "" })).toThrow("O que você mais admira nessa pessoa");
     expect(() => parseCheckoutInput({ ...validInput, tone: "romantico" })).toThrow("Tom inválido");
   });
 });

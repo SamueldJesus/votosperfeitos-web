@@ -9,6 +9,7 @@ const checkoutInput = {
   howMet: "Nos conhecemos em uma padaria em um sábado de chuva.",
   insideJoke: "Ele sempre esquece a chave de casa.",
   certainMoment: "Quando ele cuidou de mim durante uma gripe.",
+  admiration: "Admiro a calma e o cuidado dele nos detalhes.",
   deepPromise: "Prometo caminhar ao seu lado nos dias bons e difíceis.",
   tone: "lagrimas",
 };

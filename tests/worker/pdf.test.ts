@@ -13,6 +13,7 @@ const order = {
     howMet: "Nos conhecemos em uma padaria.",
     insideJoke: "A chave de casa.",
     certainMoment: "Quando ele cuidou de mim.",
+    admiration: "Admiro o cuidado e a calma dele.",
     deepPromise: "Prometo caminhar ao seu lado.",
     tone: "lagrimas" as const,
   },

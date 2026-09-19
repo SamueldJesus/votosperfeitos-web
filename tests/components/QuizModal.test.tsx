@@ -27,9 +27,9 @@ describe("QuizModal", () => {
     );
     render(<QuizModal isOpen onClose={vi.fn()} />);
 
-    fireEvent.change(screen.getByLabelText("Seu e-mail para receber os PDFs"), { target: { value: "ana@example.com" } });
-    fireEvent.change(screen.getByLabelText("Seu nome ou apelido"), { target: { value: "Ana" } });
-    fireEvent.change(screen.getByLabelText("Nome de quem você ama"), { target: { value: "João" } });
+    fireEvent.change(screen.getByLabelText("Seu melhor e-mail para receber os PDFs"), { target: { value: "ana@example.com" } });
+    fireEvent.change(screen.getByLabelText("Seu nome ou apelido nos votos"), { target: { value: "Ana" } });
+    fireEvent.change(screen.getByLabelText("Nome ou apelido de quem você ama"), { target: { value: "João" } });
     await user.click(screen.getByRole("button", { name: "Continuar" }));
 
     fireEvent.change(screen.getByLabelText("Como vocês se conheceram"), { target: { value: "Nos conhecemos em uma padaria." } });
@@ -38,9 +38,10 @@ describe("QuizModal", () => {
     await user.click(screen.getByRole("button", { name: "Continuar" }));
     fireEvent.change(screen.getByLabelText("Um momento que confirmou esse amor"), { target: { value: "Quando ele cuidou de mim." } });
     await user.click(screen.getByRole("button", { name: "Continuar" }));
-    await user.click(screen.getByRole("button", { name: /Lágrimas e Coração/ }));
+    fireEvent.change(screen.getByLabelText("O que você mais admira nessa pessoa?"), { target: { value: "Admiro o jeito como ele cuida de todos com calma." } });
     await user.click(screen.getByRole("button", { name: "Continuar" }));
     fireEvent.change(screen.getByLabelText("Uma promessa que vem do coração"), { target: { value: "Prometo caminhar ao seu lado." } });
+    await user.click(screen.getByRole("button", { name: /Lágrimas e Coração/ }));
     await user.click(screen.getByRole("button", { name: "Gerar Pix seguro de R$ 47" }));
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce());
@@ -53,6 +54,7 @@ describe("QuizModal", () => {
       tone: "lagrimas",
       speakerName: "Ana",
       partnerName: "João",
+      admiration: "Admiro o jeito como ele cuida de todos com calma.",
     });
     expect(await screen.findByRole("heading", { name: "Seu Pix está pronto" })).not.toBeNull();
     const pixModal = screen.getByTestId("pix-payment-modal");

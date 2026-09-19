@@ -1,10 +1,19 @@
 import type { Env } from "./env";
-import type { GeneratedVow, StoredOrder } from "./types";
+import type { GeneratedVow, StoredOrder, Tone } from "./types";
 
 interface OpenAIResponse {
   output_text?: string;
   output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
 }
+
+const toneGuidance: Record<Tone, string> = {
+  lagrimas:
+    "emocional, íntimo e elegante; use gratidão, memória afetiva e promessas maduras, sem melodrama excessivo",
+  sorrisos:
+    "leve, cúmplice e romântico; inclua humor sutil quando houver material, sem piadas constrangedoras ou sarcasmo",
+  classica:
+    "solene, atemporal e direto; privilegie promessas claras, frases limpas e uma cadência de cerimônia",
+};
 
 const vowSchema = {
   type: "object",
@@ -75,6 +84,10 @@ function parseGeneratedVows(value: unknown): GeneratedVow[] {
       throw new Error("Resposta da IA inválida");
     }
 
+    if (body.length < 600) {
+      throw new Error("Cada variação precisa ter conteúdo suficiente para leitura no altar");
+    }
+
     ids.add(id);
     bodies.add(body);
     return { id: id as GeneratedVow["id"], title, subtitle, body };
@@ -99,21 +112,37 @@ export async function generateVows(env: Env, order: StoredOrder): Promise<Genera
       input: [
         {
           role: "system",
-          content:
-            "Você escreve votos de casamento em português brasileiro. Use apenas os fatos fornecidos pela pessoa compradora; nunca invente memórias, locais, datas ou promessas. Escreva três variações inéditas no mesmo tom selecionado. A variação 1 foca na história, a 2 nas promessas e a 3 tem leitura direta e íntima. Cada uma deve ser calorosa, específica e pronta para ser lida no altar.",
+          content: [
+            "Você é uma pessoa especialista em escrever votos de casamento em português brasileiro para serem lidos em cerimônia.",
+            "Entregue um produto final digno de compra: pessoal, específico, elegante e pronto para revisão final pela pessoa compradora.",
+            "Use somente os fatos fornecidos. Nunca invente datas, cidades, familiares, viagens, profissões, perdas, pedidos de casamento, filhos, religião ou promessas que não estejam nas respostas.",
+            "Não escreva como IA. Evite frases genéricas como 'desde o primeiro dia', 'minha alma gêmea', 'você é meu porto seguro' ou 'te amo mais que tudo' a menos que a resposta sustente isso.",
+            "Cada variação deve ter entre 430 e 650 palavras, com parágrafos curtos, cadência oral e marcações discretas de pausa como [pausa breve] ou [respire].",
+            "Inclua: abertura com endereço direto à pessoa amada, 2 ou 3 detalhes concretos fornecidos, uma virada emocional, admiração explícita, 3 a 5 promessas concretas e fechamento memorável.",
+            "A variação 1 deve priorizar a história do casal. A variação 2 deve priorizar promessas e futuro. A variação 3 deve ser mais direta, íntima e fácil de ler no altar.",
+            "Não mencione que o texto foi gerado por IA, não explique o processo e não inclua comentários fora do JSON.",
+          ].join(" "),
         },
         {
           role: "user",
           content: JSON.stringify({
             tomSelecionado: order.tone,
+            direcaoDoTom: toneGuidance[order.tone],
+            instrucoesDeEntrega: {
+              quantidade: "3 variações completas e diferentes entre si",
+              uso: "votos de casamento para leitura em voz alta no altar",
+              idioma: "português brasileiro natural, caloroso e sem exageros",
+              formatoDoCorpo: "texto corrido com parágrafos, pausas de leitura e sem listas",
+            },
             historia: {
               quemFala: order.answers.who,
               nomeDeQuemFala: order.answers.speakerName,
               nomeDaPessoaAmada: order.answers.partnerName,
               comoSeConheceram: order.answers.howMet,
-              lembrancaEspecial: order.answers.insideJoke,
-              momentoMarcante: order.answers.certainMoment,
-              promessa: order.answers.deepPromise,
+              lembrancaEspecialOuCumplicidade: order.answers.insideJoke,
+              momentoEmQueTeveCerteza: order.answers.certainMoment,
+              oQueAdmiraNaPessoa: order.answers.admiration,
+              promessaPrincipal: order.answers.deepPromise,
             },
           }),
         },

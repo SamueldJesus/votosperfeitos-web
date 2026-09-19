@@ -11,6 +11,7 @@ export interface CheckoutInput {
   howMet: string;
   insideJoke: string;
   certainMoment: string;
+  admiration: string;
   deepPromise: string;
   tone: Tone;
   tracking?: {
