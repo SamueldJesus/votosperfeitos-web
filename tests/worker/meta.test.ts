@@ -17,7 +17,7 @@ const event = {
   fbc: "fb.1.1700000000.ClickId",
   ip: "198.51.100.5",
   userAgent: "test-agent",
-  value: 47,
+  value: 1,
   currency: "BRL" as const,
 };
 
@@ -50,7 +50,7 @@ describe("Meta CAPI events", () => {
     const payload = JSON.parse(String((request as RequestInit).body));
     expect(payload.access_token).toBe("capi-token");
     expect(payload.data[0].user_data.em).not.toContain("Ana");
-    expect(payload.data[0].custom_data).toMatchObject({ value: 47, currency: "BRL" });
+    expect(payload.data[0].custom_data).toMatchObject({ value: 1, currency: "BRL" });
   });
 });
 

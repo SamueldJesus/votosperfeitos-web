@@ -50,7 +50,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-2xl sm:text-3xl font-light text-[#78716C]">R$</span>
                 <span className="font-serif-luxury text-6xl sm:text-7xl font-bold text-[#1C1917] tracking-tight">
-                  47<span className="text-4xl sm:text-5xl font-normal text-[#B38E46]">,00</span>
+                  1<span className="text-4xl sm:text-5xl font-normal text-[#B38E46]">,00</span>
                 </span>
               </div>
 
@@ -125,7 +125,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                 onClick={onOpenQuiz}
                 className="w-full relative group overflow-hidden bg-gradient-to-r from-[#B38E46] via-[#C5A059] to-[#9C7836] hover:from-[#9C7836] hover:to-[#836224] text-white py-4.5 px-8 rounded-full text-base sm:text-lg font-bold transition-all duration-300 shadow-gold-glow hover:shadow-gold-glow-lg cursor-pointer flex items-center justify-center gap-2"
               >
-                <span className="tracking-wide">Criar meus votos por R$ 47</span>
+                <span className="tracking-wide">Criar meus votos por R$ 1</span>
                 <ArrowRight className="w-5 h-5 ml-1 transition-transform duration-300 group-hover:translate-x-1" />
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </button>

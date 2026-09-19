@@ -58,7 +58,7 @@ Não inclua valores de segredos em `wrangler.toml`, Git ou no cliente.
 3. Faça uma compra Pix de sandbox e confirme que o pedido chega a `sent` no D1, que a fila teve um trabalho e que o e-mail contém três PDFs.
 4. Publique em produção somente depois de esse fluxo funcionar de ponta a ponta.
 
-O Worker cria uma Order Pix de R$ 47,00 com uma chave de idempotência por pedido. O QR Code e o código copia e cola são exibidos no modal; cartões não fazem parte deste fluxo.
+O Worker cria uma Order Pix de R$ 1,00 com uma chave de idempotência por pedido. O QR Code e o código copia e cola são exibidos no modal; cartões não fazem parte deste fluxo.
 
 ## Dados e reprocessamento
 

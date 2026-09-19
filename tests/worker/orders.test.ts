@@ -31,5 +31,5 @@ describe("parseCheckoutInput", () => {
 });
 
 it("keeps the sale amount server-owned", () => {
-  expect(ORDER_AMOUNT_CENTS).toBe(4700);
+  expect(ORDER_AMOUNT_CENTS).toBe(100);
 });

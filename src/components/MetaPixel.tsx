@@ -85,7 +85,7 @@ export function createCheckoutTracking(): BrowserMetaTracking | null {
 
 export function trackInitiateCheckout(tracking: BrowserMetaTracking | null): void {
   if (!tracking || !window.fbq) return;
-  window.fbq("track", "InitiateCheckout", { value: 47, currency: "BRL" }, { eventID: tracking.eventId });
+  window.fbq("track", "InitiateCheckout", { value: 1, currency: "BRL" }, { eventID: tracking.eventId });
 }
 
 export function MetaPixel() {

@@ -36,7 +36,7 @@ export function FloatingMobileCta({ onOpenQuiz }: FloatingMobileCtaProps) {
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#78716C]">Por</span>
-            <span className="text-sm font-bold text-[#B38E46]">R$ 47,00</span>
+            <span className="text-sm font-bold text-[#B38E46]">R$ 1,00</span>
           </div>
         </div>
 
@@ -45,7 +45,7 @@ export function FloatingMobileCta({ onOpenQuiz }: FloatingMobileCtaProps) {
           className="flex-1 bg-gradient-to-r from-[#1C1917] to-[#292524] text-white py-3 px-4 rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
         >
           <PenLine className="w-3.5 h-3.5 text-[#C5A059]" />
-          <span>Criar por R$ 47</span>
+          <span>Criar por R$ 1</span>
           <ArrowRight className="w-3.5 h-3.5 text-[#C5A059]" />
         </button>
       </div>

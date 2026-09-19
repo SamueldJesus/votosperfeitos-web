@@ -43,7 +43,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
                 onClick={onOpenQuiz}
                 className="w-full sm:w-auto relative group overflow-hidden bg-[#1C1917] hover:bg-[#292524] text-white px-8 py-4 sm:py-4.5 rounded-full text-base sm:text-lg font-medium transition-all duration-300 shadow-luxury hover:shadow-luxury-hover border border-[#C5A059]/30 hover:border-[#C5A059] cursor-pointer flex items-center justify-center gap-3"
               >
-                <span className="font-semibold tracking-wide">Criar meus votos por R$ 47</span>
+                <span className="font-semibold tracking-wide">Criar meus votos por R$ 1</span>
                 <ArrowRight className="w-5 h-5 text-[#C5A059] transition-transform duration-300 group-hover:translate-x-1" />
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
               </button>

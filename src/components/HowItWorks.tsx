@@ -66,7 +66,7 @@ export function HowItWorks({ onOpenQuiz }: HowItWorksProps) {
           </h2>
 
           <p className="text-base sm:text-lg text-[#78716C] font-light leading-relaxed">
-            Comece pelas 6 perguntas. O pacote com 3 variações no tom escolhido e 3 PDFs por e-mail custa R$ 47,00, em pagamento único.
+            Comece pelas 6 perguntas. O pacote com 3 variações no tom escolhido e 3 PDFs por e-mail custa R$ 1,00, em pagamento único.
           </p>
         </div>
 

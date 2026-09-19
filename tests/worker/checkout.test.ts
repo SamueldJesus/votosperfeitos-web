@@ -67,7 +67,7 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toEqual({ error: "Dados do pedido são muito grandes" });
   });
 
-  it("creates a R$ 47,00 Pix Order and returns data for the in-page QR code", async () => {
+  it("creates a R$ 1,00 Pix Order and returns data for the in-page QR code", async () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
@@ -109,7 +109,7 @@ describe("POST /api/checkout", () => {
         ticketUrl: "https://mercadopago.test/pix",
       },
     });
-    expect(statements[0]?.values).toContain(4700);
+    expect(statements[0]?.values).toContain(100);
     expect(statements[0]?.values).toContain("pending");
 
     expect(fetchSpy).toHaveBeenCalledOnce();
@@ -118,11 +118,11 @@ describe("POST /api/checkout", () => {
     expect(orderRequest?.[1]).toMatchObject({ headers: expect.objectContaining({ "X-Idempotency-Key": "order-123" }) });
     expect(JSON.parse(String(orderRequest?.[1]?.body))).toMatchObject({
       type: "online",
-      total_amount: "47.00",
+      total_amount: "1.00",
       external_reference: "order-123",
       processing_mode: "automatic",
       payer: { email: "ana@example.com" },
-      transactions: { payments: [{ amount: "47.00", payment_method: { id: "pix", type: "bank_transfer" } }] },
+      transactions: { payments: [{ amount: "1.00", payment_method: { id: "pix", type: "bank_transfer" } }] },
     });
     expect(statements.some((statement) => statement.sql.includes("mercado_pago_order_id"))).toBe(true);
   });

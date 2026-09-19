@@ -40,7 +40,7 @@ async function handleCheckout(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(request, env): Promise<Response> {
+  async fetch(request: Request, env: Env, context?: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/checkout") {
@@ -56,7 +56,7 @@ export default {
         return json({ error: "Método não permitido" }, 405);
       }
 
-      return handleMercadoPagoWebhook(request, env);
+      return handleMercadoPagoWebhook(request, env, context);
     }
 
     if (url.pathname === "/api/meta/config") {

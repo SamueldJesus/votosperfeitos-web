@@ -130,7 +130,7 @@ export async function retryPendingMetaPurchases(env: Env): Promise<number> {
       orderId: order.id,
       fbp: tracking.fbp,
       fbc: tracking.fbc,
-      value: 47,
+      value: 1,
       currency: "BRL",
     });
     if (delivered) {

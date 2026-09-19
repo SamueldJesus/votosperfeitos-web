@@ -202,19 +202,30 @@ export async function reconcilePendingPixOrders(env: Env): Promise<void> {
   }
 }
 
-export async function handleMercadoPagoWebhook(request: Request, env: Env): Promise<Response> {
+async function processMercadoPagoWebhook(dataId: string, env: Env): Promise<void> {
+  const providerOrder = await getOrder(env, dataId);
+  if (isAccreditedPixOrder(providerOrder, dataId)) {
+    await processAccreditedPixOrder(env, providerOrder, dataId);
+  }
+}
+
+export async function handleMercadoPagoWebhook(
+  request: Request,
+  env: Env,
+  context?: Pick<ExecutionContext, "waitUntil">,
+): Promise<Response> {
   const dataId = new URL(request.url).searchParams.get("data.id");
-  if (!(await verifyMercadoPagoSignature(request, env.MP_WEBHOOK_SECRET))) {
+  if (!(await verifyMercadoPagoSignature(request, env.MP_WEBHOOK_SECRET)) || !dataId) {
     return new Response(null, { status: 401 });
   }
 
-  try {
-    const providerOrder = await getOrder(env, dataId as string);
-    if (!isAccreditedPixOrder(providerOrder, dataId as string)) {
-      return new Response(null, { status: 200 });
-    }
+  if (context) {
+    context.waitUntil(processMercadoPagoWebhook(dataId, env));
+    return new Response(null, { status: 200 });
+  }
 
-    await processAccreditedPixOrder(env, providerOrder, dataId as string);
+  try {
+    await processMercadoPagoWebhook(dataId, env);
     return new Response(null, { status: 200 });
   } catch {
     return new Response(null, { status: 500 });

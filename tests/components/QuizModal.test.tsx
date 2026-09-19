@@ -42,7 +42,7 @@ describe("QuizModal", () => {
     await user.click(screen.getByRole("button", { name: "Continuar" }));
     fireEvent.change(screen.getByLabelText("Uma promessa que vem do coração"), { target: { value: "Prometo caminhar ao seu lado." } });
     await user.click(screen.getByRole("button", { name: /Lágrimas e Coração/ }));
-    await user.click(screen.getByRole("button", { name: "Gerar Pix seguro de R$ 47" }));
+    await user.click(screen.getByRole("button", { name: "Gerar Pix seguro de R$ 1" }));
 
     await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce());
     expect(fetchSpy).toHaveBeenCalledWith(

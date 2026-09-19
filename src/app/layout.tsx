@@ -4,7 +4,7 @@ import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://votosperfeitos.avancoai.com.br"),
-  title: "Votos de casamento personalizados por R$ 47 | VotosPerfeitos",
+  title: "Votos de casamento personalizados por R$ 1 | VotosPerfeitos",
   description:
     "Responda 6 perguntas e receba 3 versões completas dos seus votos de casamento, com pausas de leitura e PDFs para imprimir ou ler no celular.",
   keywords: [
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Transforme a história de vocês em votos prontos para emocionar no altar.",
     description:
-      "Responda 6 perguntas e receba três versões de votos de casamento com PDFs por R$ 47,00.",
+      "Responda 6 perguntas e receba três versões de votos de casamento com PDFs por R$ 1,00.",
     url: "https://votosperfeitos.avancoai.com.br",
     siteName: "VotosPerfeitos Web",
     images: [
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Votos de casamento personalizados por R$ 47 | VotosPerfeitos",
+    title: "Votos de casamento personalizados por R$ 1 | VotosPerfeitos",
     description:
-      "Conte a história de vocês em 6 perguntas. Receba três versões de votos e PDF para imprimir, por R$ 47,00 em pagamento único.",
+      "Conte a história de vocês em 6 perguntas. Receba três versões de votos e PDF para imprimir, por R$ 1,00 em pagamento único.",
     images: ["/images/hero-groom-altar.jpg"]
   },
   robots: {

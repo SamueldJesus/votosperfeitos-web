@@ -18,7 +18,7 @@ function createEnv(status = "pending") {
   const statements: { sql: string; values: unknown[] }[] = [];
   const pendingOrder = {
     id: "order-123",
-    amount_cents: 4700,
+    amount_cents: 100,
     status,
     mercado_pago_order_id: "ORD-123",
     email: "ana@example.com",
@@ -71,7 +71,7 @@ describe("handleMercadoPagoWebhook", () => {
           id: "ORD-123",
           status: "processed",
           status_detail: "accredited",
-          total_amount: "47.00",
+          total_amount: "1.00",
           currency: "BRL",
           external_reference: "order-123",
           transactions: {
@@ -79,7 +79,7 @@ describe("handleMercadoPagoWebhook", () => {
               id: "PAY-123",
               status: "processed",
               status_detail: "accredited",
-              amount: "47.00",
+              amount: "1.00",
               payment_method: { id: "pix", type: "bank_transfer" },
             }],
           },
@@ -104,6 +104,28 @@ describe("handleMercadoPagoWebhook", () => {
     expect(statements.some((statement) => statement.sql.includes("SET status = 'paid'"))).toBe(true);
   });
 
+
+  it("acknowledges a valid notification immediately when the Worker context can finish processing in the background", async () => {
+    const { env, queueSend } = createEnv();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "1.00", currency: "BRL", external_reference: "order-123",
+        transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
+      }), { status: 200 }),
+    );
+    const waitUntil = vi.fn();
+    const request = new Request("https://votosperfeitos.test/api/webhooks/mercado-pago?data.id=ORD-123", {
+      method: "POST",
+      headers: signedHeaders("ORD-123", "request-123", "webhook-secret"),
+    });
+
+    const response = await handleMercadoPagoWebhook(request, env as never, { waitUntil } as never);
+
+    expect(response.status).toBe(200);
+    expect(waitUntil).toHaveBeenCalledOnce();
+    expect(queueSend).not.toHaveBeenCalled();
+  });
+
   it("rejects a notification whose signature does not match", async () => {
     const { env, queueSend } = createEnv();
     const fetchSpy = vi.spyOn(globalThis, "fetch");
@@ -123,7 +145,7 @@ describe("handleMercadoPagoWebhook", () => {
     const { env, queueSend } = createEnv();
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({
-        id: "ORD-123", status: "processing", status_detail: "pending", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        id: "ORD-123", status: "processing", status_detail: "pending", total_amount: "1.00", currency: "BRL", external_reference: "order-123",
         transactions: { payments: [{ id: "PAY-123", status: "processing", payment_method: { id: "pix", type: "bank_transfer" } }] },
       }), { status: 200 }),
     );
@@ -140,7 +162,7 @@ describe("handleMercadoPagoWebhook", () => {
     const { env, queueSend } = createEnv("paid");
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({
-        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "1.00", currency: "BRL", external_reference: "order-123",
         transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
       }), { status: 200 }),
     );
@@ -158,7 +180,7 @@ describe("handleMercadoPagoWebhook", () => {
     Object.assign(env, { META_PIXEL_ID: "pixel-123", META_CAPI_ACCESS_TOKEN: "capi-token" });
     const fetchSpy = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify({
-        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "1.00", currency: "BRL", external_reference: "order-123",
         transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
       }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
@@ -177,7 +199,7 @@ describe("handleMercadoPagoWebhook", () => {
     const { env, queueSend } = createEnv();
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({
-        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "47.00", currency: "BRL", external_reference: "order-123",
+        id: "ORD-123", status: "processed", status_detail: "accredited", total_amount: "1.00", currency: "BRL", external_reference: "order-123",
         transactions: { payments: [{ id: "PAY-123", status: "processed", status_detail: "accredited", payment_method: { id: "pix", type: "bank_transfer" } }] },
       }), { status: 200 }),
     );
