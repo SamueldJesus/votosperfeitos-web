@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageSquareHeart, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
+import { MessageSquareHeart, CheckCircle2, Sparkles } from "lucide-react";
 
 interface BeforeAfterProps {
   onOpenQuiz: () => void;

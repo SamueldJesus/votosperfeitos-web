@@ -3,10 +3,10 @@ import "./globals.css";
 import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://votosperfeitos.com.br"),
-  title: "Votos de casamento com a sua história | VotosPerfeitos",
+  metadataBase: new URL("https://votosperfeitos.avancoai.com.br"),
+  title: "Votos de casamento personalizados por R$ 47 | VotosPerfeitos",
   description:
-    "Transforme suas memórias em 3 versões de votos de casamento com ajuda de IA. Responda 6 perguntas e dê seu toque final. Pacote com PDF por R$ 47,00.",
+    "Responda 6 perguntas e receba 3 versões completas dos seus votos de casamento, com pausas de leitura e PDFs para imprimir ou ler no celular.",
   keywords: [
     "votos de casamento",
     "gerador de votos com ia",
@@ -17,10 +17,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "VotosPerfeitos Editorial" }],
   openGraph: {
-    title: "Você sente tanto. Encontre as palavras para dizer no altar.",
+    title: "Transforme a história de vocês em votos prontos para emocionar no altar.",
     description:
-      "Suas memórias em três versões de votos de casamento no tom que você escolher. Pacote com PDF por R$ 47,00.",
-    url: "https://votosperfeitos.com.br",
+      "Responda 6 perguntas e receba três versões de votos de casamento com PDFs por R$ 47,00.",
+    url: "https://votosperfeitos.avancoai.com.br",
     siteName: "VotosPerfeitos Web",
     images: [
       {
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Votos de casamento com a sua história | VotosPerfeitos",
+    title: "Votos de casamento personalizados por R$ 47 | VotosPerfeitos",
     description:
-      "Conte a história de vocês em 6 perguntas. Três versões de votos e PDF para imprimir, por R$ 47,00 em pagamento único.",
+      "Conte a história de vocês em 6 perguntas. Receba três versões de votos e PDF para imprimir, por R$ 47,00 em pagamento único.",
     images: ["/images/hero-groom-altar.jpg"]
   },
   robots: {

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MessageCircle, Heart, Shield, Lock, ArrowUp } from "lucide-react";
+import { Mail, Shield, Lock, ArrowUp } from "lucide-react";
 
 export function Footer() {
   const scrollToTop = () => {
@@ -87,13 +87,11 @@ export function Footer() {
             </h5>
             <div className="space-y-2 text-xs text-[#A8A29E]">
               <a
-                href="https://wa.me/5511999999999?text=Ol%C3%A1,%20gostaria%20de%20tirar%20uma%20d%C3%BAvida%20sobre%20o%20VotosPerfeitos"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="mailto:contato@avancoai.com.br?subject=D%C3%BAvida%20sobre%20o%20VotosPerfeitos"
                 className="inline-flex items-center gap-2 text-white bg-white/10 hover:bg-white/15 px-3.5 py-2 rounded-xl border border-white/10 transition-colors"
               >
-                <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                <span>Suporte via WhatsApp</span>
+                <Mail className="w-4 h-4 text-[#C5A059]" />
+                <span>Suporte por e-mail</span>
               </a>
 
               <div className="flex items-center gap-2 pt-2 text-[11px] text-[#A8A29E]">
@@ -116,10 +114,10 @@ export function Footer() {
           </p>
 
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-[#FAF8F5] transition-colors">
+            <a href="/termos" className="hover:text-[#FAF8F5] transition-colors">
               Termos de Uso
             </a>
-            <a href="#" className="hover:text-[#FAF8F5] transition-colors">
+            <a href="/privacidade" className="hover:text-[#FAF8F5] transition-colors">
               Política de Privacidade
             </a>
             <button

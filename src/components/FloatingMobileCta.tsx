@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
+import { ArrowRight, PenLine } from "lucide-react";
 
 interface FloatingMobileCtaProps {
   onOpenQuiz: () => void;
@@ -44,7 +44,8 @@ export function FloatingMobileCta({ onOpenQuiz }: FloatingMobileCtaProps) {
           onClick={onOpenQuiz}
           className="flex-1 bg-gradient-to-r from-[#1C1917] to-[#292524] text-white py-3 px-4 rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
         >
-          <span>✍️ Criar meus votos</span>
+          <PenLine className="w-3.5 h-3.5 text-[#C5A059]" />
+          <span>Criar por R$ 47</span>
           <ArrowRight className="w-3.5 h-3.5 text-[#C5A059]" />
         </button>
       </div>

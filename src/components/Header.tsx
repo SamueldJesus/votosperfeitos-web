@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sparkles, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 interface HeaderProps {
   onOpenQuiz: () => void;
@@ -110,7 +110,7 @@ export function Header({ onOpenQuiz }: HeaderProps) {
               className="relative group overflow-hidden bg-gradient-to-r from-[#1C1917] to-[#292524] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#C5A059]/20 hover:border-[#C5A059] border border-transparent cursor-pointer flex items-center gap-2"
             >
               <span className="relative z-10 flex items-center gap-1.5 font-medium">
-                Criar meus votos
+                Criar por R$ 47
                 <ArrowRight className="w-3.5 h-3.5 text-[#C5A059] transition-transform duration-300 group-hover:translate-x-0.5" />
               </span>
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -164,7 +164,7 @@ export function Header({ onOpenQuiz }: HeaderProps) {
                 }}
                 className="w-full bg-[#1C1917] text-white py-3 rounded-full text-center text-sm font-medium shadow-md flex items-center justify-center gap-2"
               >
-                <span>Criar meus votos</span>
+                <span>Criar por R$ 47</span>
                 <ArrowRight className="w-4 h-4 text-[#C5A059]" />
               </button>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Check, Sparkles, ShieldCheck, Zap, ArrowRight, Clock } from "lucide-react";
+import { Check, Sparkles, ShieldCheck, Zap, ArrowRight, FileText } from "lucide-react";
 
 interface PricingSectionProps {
   onOpenQuiz: () => void;
@@ -22,11 +22,11 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
           </div>
 
           <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-medium text-[#1C1917] tracking-tight">
-            Tire os votos da lista de pendências. <span className="italic text-[#B38E46]">Leve a sua história para o altar.</span>
+            Saia da página em branco. <span className="italic text-[#B38E46]">Leve um texto seu para o altar.</span>
           </h2>
 
           <p className="text-base sm:text-lg text-[#78716C] font-light leading-relaxed">
-            Escolha o tom. Receba três variações inéditas e três PDFs por e-mail. Tudo no mesmo pacote, sem assinatura.
+            Um pagamento único para transformar suas respostas em três caminhos de votos: mais emoção, mais leveza ou mais clássico.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
           {/* Top Badge */}
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#B38E46] via-[#C5A059] to-[#9C7836] text-white text-xs font-bold uppercase tracking-widest px-6 py-1.5 rounded-full shadow-md z-20 flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Mais Escolhido pelos Noivos</span>
+            <span>Pacote único, sem assinatura</span>
           </div>
 
           <div className="bg-[#FAF8F5] rounded-3xl sm:rounded-[36px] border-2 border-[#C5A059]/50 p-7 sm:p-12 shadow-luxury hover:shadow-luxury-hover transition-all duration-300 relative overflow-hidden">
@@ -71,7 +71,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Escolha o tom que combina com você.</strong> Receba três variações inéditas dentro dele, criadas a partir das suas respostas.
+                    <strong>Escolha o tom que combina com você.</strong> Receba três versões completas criadas a partir das suas respostas.
                   </span>
                 </li>
 
@@ -89,7 +89,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Receba 3 PDFs no seu e-mail.</strong> Você escolhe a sua versão favorita, ajusta se quiser e imprime no papel que preferir.
+                    <strong>Receba 3 PDFs no seu e-mail.</strong> Você escolhe sua versão favorita, ajusta se quiser e imprime no papel que preferir.
                   </span>
                 </li>
 
@@ -98,11 +98,25 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong>Compare com calma antes de decidir.</strong> As três variações chegam no mesmo tom para você encontrar a que parece mais sua.
+                    <strong>Leia do jeito certo no altar.</strong> Os textos vêm com pausas de leitura para respirar, olhar para seu amor e não se perder.
                   </span>
                 </li>
 
               </ul>
+            </div>
+
+            <div className="rounded-3xl border border-[#E2D7C8] bg-white p-5 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#F7F1E5] text-[#B38E46]">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-[#1C1917]">O que muda depois da compra?</h4>
+                  <p className="text-sm leading-relaxed text-[#78716C]">
+                    Você deixa de tentar escrever do zero e passa a editar uma base pronta, com as memórias, promessas e jeito de falar que informou nas perguntas.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Big CTA Button */}
@@ -111,8 +125,7 @@ export function PricingSection({ onOpenQuiz }: PricingSectionProps) {
                 onClick={onOpenQuiz}
                 className="w-full relative group overflow-hidden bg-gradient-to-r from-[#B38E46] via-[#C5A059] to-[#9C7836] hover:from-[#9C7836] hover:to-[#836224] text-white py-4.5 px-8 rounded-full text-base sm:text-lg font-bold transition-all duration-300 shadow-gold-glow hover:shadow-gold-glow-lg cursor-pointer flex items-center justify-center gap-2"
               >
-                <span className="text-xl">💍</span>
-                <span className="tracking-wide">Quero criar meus votos</span>
+                <span className="tracking-wide">Criar meus votos por R$ 47</span>
                 <ArrowRight className="w-5 h-5 ml-1 transition-transform duration-300 group-hover:translate-x-1" />
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </button>

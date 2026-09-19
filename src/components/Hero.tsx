@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Heart, ShieldCheck, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Heart, ShieldCheck, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 
 interface HeroProps {
   onOpenQuiz: () => void;
@@ -22,36 +22,35 @@ export function Hero({ onOpenQuiz }: HeroProps) {
             
             {/* Tag Superior */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFFFFF] border border-[#F0EAE1] shadow-sm text-xs sm:text-sm font-medium text-[#1C1917]">
-              <span className="flex h-2 w-2 rounded-full bg-[#C5A059] animate-pulse" />
-              <span className="text-[#B38E46]">✨</span>
-              <span>Criado por especialistas em oratória & storytelling</span>
+              <span className="flex h-2 w-2 rounded-full bg-[#C5A059]" />
+              <Sparkles className="h-3.5 w-3.5 text-[#B38E46]" />
+              <span>6 perguntas guiadas para sair da página em branco</span>
             </div>
 
             {/* Headline H1 */}
             <h1 className="font-serif-luxury text-4xl sm:text-5xl lg:text-[56px] font-medium leading-[1.12] text-[#1C1917] tracking-tight">
-              Você sente tanto. <span className="italic font-normal text-[#B38E46]">Encontre as palavras</span> para dizer no altar.
+              Transforme a história de vocês em <span className="italic font-normal text-[#B38E46]">votos prontos para emocionar</span> no altar.
             </h1>
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg lg:text-xl text-[#78716C] leading-relaxed max-w-2xl font-light">
-              Escolha o tom que mais parece com você. Receba <strong className="font-semibold text-[#1C1917]">3 variações inéditas nesse mesmo tom</strong>, criadas a partir da história de vocês e enviadas por e-mail.
+              Responda 6 perguntas sobre vocês e receba <strong className="font-semibold text-[#1C1917]">3 versões completas dos seus votos</strong>, com pausas de leitura e PDF para imprimir ou ler no celular.
             </p>
 
             {/* Main CTA Block */}
             <div className="w-full sm:w-auto flex flex-col items-start gap-3 pt-2">
               <button
                 onClick={onOpenQuiz}
-                className="w-full sm:w-auto relative group overflow-hidden bg-[#1C1917] hover:bg-[#292524] text-white px-8 py-4 sm:py-4.5 rounded-full text-base sm:text-lg font-medium transition-all duration-300 shadow-luxury hover:shadow-luxury-hover border border-[#C5A059]/30 hover:border-[#C5A059] cursor-pointer animate-pulse-subtle flex items-center justify-center gap-3"
+                className="w-full sm:w-auto relative group overflow-hidden bg-[#1C1917] hover:bg-[#292524] text-white px-8 py-4 sm:py-4.5 rounded-full text-base sm:text-lg font-medium transition-all duration-300 shadow-luxury hover:shadow-luxury-hover border border-[#C5A059]/30 hover:border-[#C5A059] cursor-pointer flex items-center justify-center gap-3"
               >
-                <span className="text-xl">✍️</span>
-                <span className="font-semibold tracking-wide">Quero criar meus votos</span>
+                <span className="font-semibold tracking-wide">Criar meus votos por R$ 47</span>
                 <ArrowRight className="w-5 h-5 text-[#C5A059] transition-transform duration-300 group-hover:translate-x-1" />
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
               </button>
 
               {/* Zero Friction Subtext */}
               <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-[#78716C] pt-1">
-                <span className="font-medium text-[#B38E46]">3 variações + 3 PDFs por R$ 47,00</span>
+                <span className="font-medium text-[#B38E46]">3 versões + 3 PDFs</span>
                 <span className="text-[#C5A059]">•</span>
                 <span>Pagamento único</span>
                 <span className="text-[#C5A059]">•</span>
@@ -64,29 +63,18 @@ export function Hero({ onOpenQuiz }: HeroProps) {
 
             {/* Social Proof Trust Badges */}
             <div className="pt-4 sm:pt-6 flex flex-wrap items-center gap-4 border-t border-[#F0EAE1] w-full">
-              <div className="flex -space-x-2.5 overflow-hidden">
-                <img
-                  className="inline-block h-9 w-9 rounded-full ring-2 ring-white object-cover shadow-sm"
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-                  alt="Noiva Larissa"
-                />
-                <img
-                  className="inline-block h-9 w-9 rounded-full ring-2 ring-white object-cover shadow-sm"
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
-                  alt="Noivo Rodrigo"
-                />
-                <img
-                  className="inline-block h-9 w-9 rounded-full ring-2 ring-white object-cover shadow-sm"
-                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80"
-                  alt="Noiva Mariana"
-                />
-                <img
-                  className="inline-block h-9 w-9 rounded-full ring-2 ring-white object-cover shadow-sm"
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80"
-                  alt="Noivo Matheus"
-                />
-                <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#C5A059] text-white text-xs font-bold ring-2 ring-white shadow-sm">
-                  +3k
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-2xl border border-[#F0EAE1] bg-white px-3 py-2 shadow-sm">
+                  <span className="block text-sm font-semibold text-[#1C1917]">6</span>
+                  <span className="text-[10px] uppercase tracking-wide text-[#78716C]">perguntas</span>
+                </div>
+                <div className="rounded-2xl border border-[#F0EAE1] bg-white px-3 py-2 shadow-sm">
+                  <span className="block text-sm font-semibold text-[#1C1917]">3</span>
+                  <span className="text-[10px] uppercase tracking-wide text-[#78716C]">versões</span>
+                </div>
+                <div className="rounded-2xl border border-[#F0EAE1] bg-white px-3 py-2 shadow-sm">
+                  <span className="block text-sm font-semibold text-[#1C1917]">7 dias</span>
+                  <span className="text-[10px] uppercase tracking-wide text-[#78716C]">garantia</span>
                 </div>
               </div>
 
@@ -95,10 +83,10 @@ export function Hero({ onOpenQuiz }: HeroProps) {
                   {"★★★★★".split("").map((star, i) => (
                     <span key={i} className="text-xs">★</span>
                   ))}
-                  <span className="text-xs font-semibold text-[#1C1917] ml-1">4.9/5</span>
+                  <span className="text-xs font-semibold text-[#1C1917] ml-1">relatos recebidos</span>
                 </div>
                 <p className="text-xs sm:text-sm text-[#78716C] font-normal">
-                  <strong className="font-semibold text-[#1C1917]">+ de 3.420 votos</strong> lidos no altar com lágrimas de alegria
+                  <strong className="font-semibold text-[#1C1917]">Amostras anonimizadas</strong> de noivos que saíram da página em branco
                 </p>
               </div>
             </div>
@@ -127,9 +115,9 @@ export function Hero({ onOpenQuiz }: HeroProps) {
                 <div className="absolute bottom-4 lg:bottom-12 left-4 right-4 text-white text-xs sm:text-sm font-light flex items-center justify-between backdrop-blur-md bg-black/35 px-4 py-2.5 rounded-2xl border border-white/20">
                   <div className="flex items-center gap-2">
                     <Heart className="w-4 h-4 text-[#C5A059] fill-[#C5A059]" />
-                    <span>Lido no altar em Florianópolis/SC</span>
+                    <span>Votos com pausas de leitura</span>
                   </div>
-                  <span className="text-[#FAF8F5]/80 text-[11px]">100% autêntico</span>
+                  <span className="text-[#FAF8F5]/80 text-[11px]">para ajustar com calma</span>
                 </div>
               </div>
 
