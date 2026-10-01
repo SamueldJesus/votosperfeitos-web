@@ -40,6 +40,9 @@ function createEnv() {
       OPENAI_API_KEY: "openai-test",
       MP_ACCESS_TOKEN: "mp-test",
       MP_WEBHOOK_SECRET: "webhook-test",
+      PAGARME_SECRET_KEY: "sk_test_example",
+      PAGARME_BASE_URL: "https://sdx-api.pagar.me/core/v5",
+      PAGARME_WEBHOOK_TOKEN: "webhook-token",
       RESEND_API_KEY: "resend-test",
       EMAIL_FROM: "VotosPerfeitos <oi@example.com>",
     },
@@ -67,26 +70,12 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toEqual({ error: "Dados do pedido são muito grandes" });
   });
 
-  it("creates a R$ 1,00 Pix Order and returns data for the in-page QR code", async () => {
+  it("creates a R$ 47,00 Pagar.me Pix checkout and returns its hosted URL", async () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
-        JSON.stringify({
-          id: "ORD-123",
-          transactions: {
-            payments: [
-              {
-                id: "PAY-123",
-                payment_method: {
-                  qr_code: "pix-copy-paste",
-                  qr_code_base64: "aGVsbG8=",
-                  ticket_url: "https://mercadopago.test/pix",
-                },
-              },
-            ],
-          },
-        }),
-        { status: 201 },
+        JSON.stringify({ id: "pl_123", url: "https://payment-link.pagar.me/pl_123", status: "active" }),
+        { status: 200 },
       ),
     );
     const { env, statements } = createEnv();
@@ -103,28 +92,25 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toEqual({
       orderId: "order-123",
       payment: {
-        orderId: "ORD-123",
-        qrCode: "pix-copy-paste",
-        qrCodeBase64: "aGVsbG8=",
-        ticketUrl: "https://mercadopago.test/pix",
+        linkId: "pl_123",
+        url: "https://payment-link.pagar.me/pl_123",
       },
     });
-    expect(statements[0]?.values).toContain(100);
+    expect(statements[0]?.values).toContain(4700);
     expect(statements[0]?.values).toContain("pending");
 
     expect(fetchSpy).toHaveBeenCalledOnce();
     const orderRequest = fetchSpy.mock.calls[0];
-    expect(orderRequest?.[0]).toBe("https://api.mercadopago.com/v1/orders");
-    expect(orderRequest?.[1]).toMatchObject({ headers: expect.objectContaining({ "X-Idempotency-Key": "order-123" }) });
+    expect(orderRequest?.[0]).toBe("https://sdx-api.pagar.me/core/v5/paymentlinks");
+    expect(orderRequest?.[1]).toMatchObject({ headers: expect.objectContaining({ "Idempotency-key": "order-123" }) });
     expect(JSON.parse(String(orderRequest?.[1]?.body))).toMatchObject({
-      type: "online",
-      total_amount: "1.00",
-      external_reference: "order-123",
-      processing_mode: "automatic",
-      payer: { email: "ana@example.com" },
-      transactions: { payments: [{ amount: "1.00", payment_method: { id: "pix", type: "bank_transfer" } }] },
+      type: "order",
+      order_code: "order-123",
+      max_paid_sessions: 1,
+      payment_settings: { accepted_payment_methods: ["pix"] },
+      cart_settings: { items: [{ amount: 4700, default_quantity: 1 }] },
     });
-    expect(statements.some((statement) => statement.sql.includes("mercado_pago_order_id"))).toBe(true);
+    expect(statements.some((statement) => statement.sql.includes("pagarme_link_id"))).toBe(true);
   });
 
   it("does not expose a provider failure as a buyer input error", async () => {
@@ -149,9 +135,8 @@ describe("Meta checkout tracking", () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
     const fetchSpy = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify({
-        id: "ORD-123",
-        transactions: { payments: [{ id: "PAY-123", payment_method: { qr_code: "pix", qr_code_base64: "aGVsbG8=", ticket_url: "https://mercadopago.test/pix" } }] },
-      }), { status: 201 }))
+        id: "pl_123", url: "https://payment-link.pagar.me/pl_123", status: "active",
+      }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
     const { env } = createEnv();
     Object.assign(env, { META_PIXEL_ID: "pixel-123", META_CAPI_ACCESS_TOKEN: "capi-token" });

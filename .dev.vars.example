@@ -1,7 +1,13 @@
 # Copy to .dev.vars for `npx wrangler dev`. Fill locally; never commit credentials.
 OPENAI_API_KEY=
+# Keep these while older Mercado Pago orders may still need reconciliation.
 MP_ACCESS_TOKEN=
 MP_WEBHOOK_SECRET=
+PAGARME_SECRET_KEY=
+# Local test API; production uses PAGARME_BASE_URL in wrangler.toml.
+PAGARME_BASE_URL=https://sdx-api.pagar.me/core/v5
+# Random shared token used in the webhook URL as ?token=.
+PAGARME_WEBHOOK_TOKEN=
 RESEND_API_KEY=
 EMAIL_FROM=
 META_PIXEL_ID=

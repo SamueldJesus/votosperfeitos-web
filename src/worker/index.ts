@@ -1,9 +1,10 @@
 import type { Env } from "./env";
 import { errorResponse, json } from "./http";
 import { createCheckout, parseCheckoutInput } from "./orders";
-import { handleVowMessage } from "./queue";
+import { handleVowMessage, recoverPaidOrders } from "./queue";
 import { cleanupExpiredOrders } from "./retention";
 import { handleMercadoPagoWebhook, reconcilePendingPixOrders } from "./webhook";
+import { handlePagarmeWebhook, reconcilePendingPagarmeOrders } from "./pagarme-webhook";
 import { retryPendingMetaPurchases } from "./meta";
 
 async function handleCheckout(request: Request, env: Env): Promise<Response> {
@@ -28,10 +29,8 @@ async function handleCheckout(request: Request, env: Env): Promise<Response> {
     return json({
       orderId: result.orderId,
       payment: {
-        orderId: result.payment.orderId,
-        qrCode: result.payment.qrCode,
-        qrCodeBase64: result.payment.qrCodeBase64,
-        ticketUrl: result.payment.ticketUrl,
+        linkId: result.payment.linkId,
+        url: result.payment.url,
       },
     }, 201);
   } catch {
@@ -59,6 +58,14 @@ export default {
       return handleMercadoPagoWebhook(request, env, context);
     }
 
+    if (url.pathname === "/api/webhooks/pagarme") {
+      if (request.method !== "POST") {
+        return json({ error: "Método não permitido" }, 405);
+      }
+
+      return handlePagarmeWebhook(request, env, context);
+    }
+
     if (url.pathname === "/api/meta/config") {
       if (request.method !== "GET") return json({ error: "Método não permitido" }, 405);
       return new Response(JSON.stringify({ pixelId: env.META_PIXEL_ID || null }), {
@@ -72,6 +79,6 @@ export default {
     await Promise.all(batch.messages.map((message) => handleVowMessage(message, env)));
   },
   async scheduled(_event, env): Promise<void> {
-    await Promise.all([cleanupExpiredOrders(env), retryPendingMetaPurchases(env), reconcilePendingPixOrders(env)]);
+    await Promise.all([cleanupExpiredOrders(env), retryPendingMetaPurchases(env), reconcilePendingPixOrders(env), reconcilePendingPagarmeOrders(env), recoverPaidOrders(env)]);
   },
 } satisfies ExportedHandler<Env>;

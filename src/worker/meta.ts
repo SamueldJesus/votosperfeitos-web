@@ -100,13 +100,14 @@ interface PendingPurchaseRow {
   id: string;
   email: string;
   tracking_json: string;
+  amount_cents: number;
   paid_at: string;
 }
 
 export async function retryPendingMetaPurchases(env: Env): Promise<number> {
   if (!env.META_PIXEL_ID || !env.META_CAPI_ACCESS_TOKEN) return 0;
   const pending = await env.ORDERS.prepare(
-    `SELECT id, email, tracking_json, paid_at
+    `SELECT id, email, tracking_json, amount_cents, paid_at
      FROM orders
      WHERE paid_at IS NOT NULL AND meta_purchase_sent_at IS NULL AND status IN ('paid', 'processing', 'sent')
      ORDER BY paid_at ASC
@@ -130,7 +131,7 @@ export async function retryPendingMetaPurchases(env: Env): Promise<number> {
       orderId: order.id,
       fbp: tracking.fbp,
       fbc: tracking.fbc,
-      value: 1,
+      value: order.amount_cents / 100,
       currency: "BRL",
     });
     if (delivered) {

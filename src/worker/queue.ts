@@ -79,6 +79,26 @@ export async function processVowJob(message: { orderId: string }, env: Env): Pro
     .run();
 }
 
+export async function recoverPaidOrders(env: Env): Promise<void> {
+  const retryCutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const paid = await env.ORDERS.prepare(
+    `SELECT id FROM orders
+     WHERE status = 'paid' AND updated_at < ?
+     ORDER BY updated_at ASC LIMIT 50`,
+  ).bind(retryCutoff).all<{ id: string }>();
+
+  for (const order of paid.results) {
+    try {
+      await env.VOW_JOBS.send({ orderId: order.id });
+      await env.ORDERS.prepare(
+        "UPDATE orders SET updated_at = ? WHERE id = ? AND status = 'paid'",
+      ).bind(new Date().toISOString(), order.id).run();
+    } catch {
+      // Keep the old timestamp so the next scheduled run retries the publish.
+    }
+  }
+}
+
 async function restoreForRetry(orderId: string, env: Env): Promise<boolean> {
   const order = await env.ORDERS.prepare(
     "SELECT delivery_attempts FROM orders WHERE id = ? AND status = 'processing'",

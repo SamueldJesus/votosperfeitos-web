@@ -1,9 +1,9 @@
 import type { Env } from "./env";
-import { createPixOrder, type MercadoPagoPixPayment } from "./mercado-pago";
+import { createPagarmePaymentLink, type PagarmePaymentLink } from "./pagarme";
 import { TONES, type CheckoutInput, type Tone } from "./types";
 import { parseMetaTracking, sendMetaEvent } from "./meta";
 
-export const ORDER_AMOUNT_CENTS = 100;
+export const ORDER_AMOUNT_CENTS = 4700;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const MAX_NARRATIVE_LENGTH = 4000;
@@ -78,7 +78,7 @@ export async function createCheckout(
   env: Env,
   input: CheckoutInput,
   requestContext: { sourceUrl: string; ip?: string; userAgent?: string },
-): Promise<{ orderId: string; payment: MercadoPagoPixPayment }> {
+): Promise<{ orderId: string; payment: PagarmePaymentLink }> {
   const orderId = createOrderId();
   const now = new Date().toISOString();
 
@@ -100,16 +100,15 @@ export async function createCheckout(
     )
     .run();
 
-  const payment = await createPixOrder(env, {
+  const payment = await createPagarmePaymentLink(env, {
     orderId,
-    email: input.email,
     amountCents: ORDER_AMOUNT_CENTS,
   });
 
   await env.ORDERS.prepare(
-    "UPDATE orders SET mercado_pago_order_id = ?, updated_at = ? WHERE id = ?",
+    "UPDATE orders SET pagarme_link_id = ?, updated_at = ? WHERE id = ?",
   )
-    .bind(payment.orderId, new Date().toISOString(), orderId)
+    .bind(payment.linkId, new Date().toISOString(), orderId)
     .run();
 
   if (input.tracking) {

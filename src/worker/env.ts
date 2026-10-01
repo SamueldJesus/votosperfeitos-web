@@ -6,6 +6,9 @@ export interface Env {
   OPENAI_API_KEY: string;
   MP_ACCESS_TOKEN: string;
   MP_WEBHOOK_SECRET: string;
+  PAGARME_SECRET_KEY: string;
+  PAGARME_BASE_URL: string;
+  PAGARME_WEBHOOK_TOKEN: string;
   RESEND_API_KEY: string;
   EMAIL_FROM: string;
   META_PIXEL_ID: string;
