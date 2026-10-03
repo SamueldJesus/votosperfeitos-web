@@ -45,6 +45,9 @@ export interface OrderRecord {
   mercado_pago_preference_id: string | null;
   mercado_pago_order_id: string | null;
   mercado_pago_payment_id: string | null;
+  pagarme_link_id: string | null;
+  pagarme_order_id: string | null;
+  pagarme_charge_id: string | null;
   delivery_attempts: number;
   created_at: string;
   updated_at: string;

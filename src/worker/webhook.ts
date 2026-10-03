@@ -1,5 +1,4 @@
 import type { Env } from "./env";
-import { ORDER_AMOUNT_CENTS } from "./orders";
 import { sendMetaEvent } from "./meta";
 
 interface MercadoPagoOrder {
@@ -88,7 +87,7 @@ async function getOrder(env: Env, providerOrderId: string): Promise<MercadoPagoO
   return (await response.json()) as MercadoPagoOrder;
 }
 
-function isAccreditedPixOrder(providerOrder: MercadoPagoOrder, providerOrderId: string): boolean {
+function isAccreditedPixOrder(providerOrder: MercadoPagoOrder, providerOrderId: string, amountCentsExpected: number): boolean {
   const amountCents = Math.round(Number(providerOrder.total_amount ?? 0) * 100);
   const payment = providerOrder.transactions?.payments?.[0];
 
@@ -98,7 +97,7 @@ function isAccreditedPixOrder(providerOrder: MercadoPagoOrder, providerOrderId: 
       providerOrder.status === "processed" &&
       providerOrder.status_detail === "accredited" &&
       (providerOrder.currency ?? providerOrder.currency_id) === "BRL" &&
-      amountCents === ORDER_AMOUNT_CENTS &&
+      amountCents === amountCentsExpected &&
       payment?.status === "processed" &&
       payment.status_detail === "accredited" &&
       payment.payment_method?.id === "pix",
@@ -128,7 +127,7 @@ async function processAccreditedPixOrder(
 
   if (
     !order ||
-    order.amount_cents !== ORDER_AMOUNT_CENTS ||
+    !isAccreditedPixOrder(providerOrder, providerOrderId, order.amount_cents) ||
     order.mercado_pago_order_id !== providerOrderId ||
     order.status !== "pending"
   ) {
@@ -166,7 +165,7 @@ async function processAccreditedPixOrder(
     orderId,
     fbp: tracking.fbp,
     fbc: tracking.fbc,
-    value: ORDER_AMOUNT_CENTS / 100,
+    value: order.amount_cents / 100,
     currency: "BRL",
   });
 
@@ -193,9 +192,7 @@ export async function reconcilePendingPixOrders(env: Env): Promise<void> {
   for (const order of pending.results) {
     try {
       const providerOrder = await getOrder(env, order.mercado_pago_order_id);
-      if (isAccreditedPixOrder(providerOrder, order.mercado_pago_order_id)) {
-        await processAccreditedPixOrder(env, providerOrder, order.mercado_pago_order_id);
-      }
+      await processAccreditedPixOrder(env, providerOrder, order.mercado_pago_order_id);
     } catch {
       // A later scheduled run retries transient provider and database failures.
     }
@@ -204,9 +201,7 @@ export async function reconcilePendingPixOrders(env: Env): Promise<void> {
 
 async function processMercadoPagoWebhook(dataId: string, env: Env): Promise<void> {
   const providerOrder = await getOrder(env, dataId);
-  if (isAccreditedPixOrder(providerOrder, dataId)) {
-    await processAccreditedPixOrder(env, providerOrder, dataId);
-  }
+  await processAccreditedPixOrder(env, providerOrder, dataId);
 }
 
 export async function handleMercadoPagoWebhook(

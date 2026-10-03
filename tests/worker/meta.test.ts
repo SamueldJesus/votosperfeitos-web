@@ -65,7 +65,7 @@ describe("Meta Purchase recovery", () => {
             sql,
             values: [] as unknown[],
             bind(...values: unknown[]) { statement.values = values; return statement; },
-            all: async () => ({ results: [{ id: "order-123", email: "ana@example.com", tracking_json: "{}", paid_at: "2026-09-16T10:00:00.000Z" }] }),
+            all: async () => ({ results: [{ id: "order-123", email: "ana@example.com", tracking_json: "{}", amount_cents: 4700, paid_at: "2026-09-16T10:00:00.000Z" }] }),
             run: async () => ({ success: true, meta: { changes: 1 } }),
           };
           statements.push(statement);
@@ -73,11 +73,13 @@ describe("Meta Purchase recovery", () => {
         },
       },
     };
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ events_received: 1 }), { status: 200 }));
     const { retryPendingMetaPurchases } = await import("../../src/worker/meta");
 
     await expect(retryPendingMetaPurchases(retryEnv as never)).resolves.toBe(1);
 
+    const requestBody = JSON.parse(String(fetchSpy.mock.calls[0]?.[1]?.body));
+    expect(requestBody.data[0].custom_data.value).toBe(47);
     expect(statements.some((statement) => statement.sql.includes("meta_purchase_sent_at"))).toBe(true);
   });
 });

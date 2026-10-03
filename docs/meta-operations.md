@@ -4,8 +4,8 @@
 
 - Pixel no navegador apenas após consentimento de marketing.
 - `PageView` após o Pixel carregar.
-- `InitiateCheckout` após o QR Pix ser criado com sucesso, no navegador e na Conversions API com o mesmo ID de evento.
-- `Purchase` apenas depois de o webhook assinado do Mercado Pago confirmar Pix acreditado.
+- `InitiateCheckout` após o link de checkout Pix do Pagar.me ser criado com sucesso, no navegador e na Conversions API com o mesmo ID de evento.
+- `Purchase` apenas depois de o webhook `order.paid` levar o Worker a confirmar o pagamento de R$ 47,00 na API do Pagar.me. Pedidos antigos do Mercado Pago continuam seguindo a confirmação própria.
 - Reenvio diário de compras que não chegaram à Conversions API.
 - Campanha criada por `npm run meta:launch` sempre com status `PAUSED`.
 
@@ -44,7 +44,7 @@ O lançador consulta Conta, Página, Pixel e campanhas existentes antes da prime
 ## Validação antes de ativar
 
 1. Use `META_TEST_EVENT_CODE` para validar `PageView`, `InitiateCheckout` e `Purchase` no Events Manager.
-2. Gere um Pix de teste e confirme a compra usando as credenciais de sandbox apropriadas do Mercado Pago, se disponíveis.
+2. Abra um checkout Pix hospedado do Pagar.me em sandbox por R$ 47,00 e confirme uma compra de teste. Valide que o Worker consulta o pedido na API do Pagar.me antes de enviar `Purchase` e que o evento não se repete após reenviar o webhook.
 3. Confirme no Ads Manager que há uma campanha, um conjunto e três anúncios com `PAUSED`/`effective_status` não ativo.
 4. Remova `META_TEST_EVENT_CODE` quando a validação terminar.
 5. Deixe a campanha rodar sete dias sem mudar orçamento, criativos ou público; depois ajuste no máximo 10–15% a cada 48 horas.

@@ -3,7 +3,7 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MetaPixel } from "../../src/components/MetaPixel";
+import { MetaPixel, trackInitiateCheckout } from "../../src/components/MetaPixel";
 
 beforeEach(() => {
   const values = new Map<string, string>();
@@ -49,5 +49,14 @@ describe("MetaPixel", () => {
     expect(document.querySelector('script[data-meta-pixel="true"]')).not.toBeNull();
     expect(fbq).toHaveBeenCalledWith("init", "pixel-123");
     expect(fbq).toHaveBeenCalledWith("track", "PageView", {}, expect.objectContaining({ eventID: expect.any(String) }));
+  });
+
+  it("records the R$ 47 checkout value when checkout is created", () => {
+    const fbq = vi.fn();
+    (window as Window & { fbq?: unknown }).fbq = fbq;
+
+    trackInitiateCheckout({ eventId: "checkout-event-123" });
+
+    expect(fbq).toHaveBeenCalledWith("track", "InitiateCheckout", { value: 47, currency: "BRL" }, { eventID: "checkout-event-123" });
   });
 });

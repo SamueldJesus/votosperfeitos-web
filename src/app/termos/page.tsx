@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[#1C1917]">2. Pagamento e entrega</h2>
             <p>
-              A compra é feita por pagamento único via Pix. Após a confirmação do pagamento, o sistema gera os textos e envia os PDFs para o e-mail informado no checkout. O prazo pode variar conforme a confirmação do provedor de pagamento e a fila de processamento.
+              A compra é feita por pagamento único via Pix. Após a confirmação do pagamento, o sistema gera os textos e envia os três PDFs para o e-mail informado no questionário do VotosPerfeitos, mesmo que o comprador informe outro e-mail no checkout do Pagar.me. O prazo pode variar conforme a confirmação do provedor de pagamento e a fila de processamento.
             </p>
           </section>
 
