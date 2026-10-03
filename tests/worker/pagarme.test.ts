@@ -39,6 +39,7 @@ describe("Pagar.me checkout", () => {
     const [url, options] = fetchSpy.mock.calls[0];
     expect(url).toBe("https://sdx-api.pagar.me/core/v5/paymentlinks");
     expect(options?.method).toBe("POST");
+    expect(options?.redirect).toBe("manual");
     expect(options?.headers).toMatchObject({
       Authorization: "Basic c2tfdGVzdF9leGFtcGxlOg==",
       "Content-Type": "application/json",
@@ -50,7 +51,7 @@ describe("Pagar.me checkout", () => {
       order_code: "local-order-123",
       max_paid_sessions: 1,
       expires_in: 10_080,
-      payment_settings: { accepted_payment_methods: ["pix"], pix_settings: {} },
+      payment_settings: { accepted_payment_methods: ["pix"], pix_settings: { expires_in: 3_600 } },
       cart_settings: {
         items: [{ name: "Votos Perfeitos", amount: 4700, default_quantity: 1 }],
       },
@@ -77,6 +78,16 @@ describe("Pagar.me checkout", () => {
       .rejects.toThrow("Não foi possível iniciar o pagamento agora");
   });
 
+  it("rejects a redirect without forwarding the secret key to another host", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, {
+      status: 302,
+      headers: { Location: "https://evil.test/capture" },
+    }));
+
+    await expect(createPagarmePaymentLink(env, { orderId: "local-order-123", amountCents: 4700 }))
+      .rejects.toThrow("Não foi possível iniciar o pagamento agora");
+  });
+
   it("accepts the alternate official checkout host", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ id: "pl_123", url: "https://checkout.pagar.me/pl_123" }), { status: 200 }),
@@ -84,6 +95,26 @@ describe("Pagar.me checkout", () => {
 
     await expect(createPagarmePaymentLink(env, { orderId: "local-order-123", amountCents: 4700 }))
       .resolves.toEqual({ linkId: "pl_123", url: "https://checkout.pagar.me/pl_123" });
+  });
+
+  it("accepts the sandbox checkout host returned by Pagar.me", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ id: "pl_123", url: "https://payment-link-v3-sdx.pagar.me/pl_123" }), { status: 200 }),
+    );
+
+    await expect(createPagarmePaymentLink(env, { orderId: "local-order-123", amountCents: 4700 }))
+      .resolves.toEqual({ linkId: "pl_123", url: "https://payment-link-v3-sdx.pagar.me/pl_123" });
+  });
+
+  it("does not send buyers to a sandbox checkout when production is configured", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ id: "pl_123", url: "https://payment-link-v3-sdx.pagar.me/pl_123" }), { status: 200 }),
+    );
+
+    await expect(createPagarmePaymentLink(
+      { ...env, PAGARME_BASE_URL: "https://api.pagar.me/core/v5" },
+      { orderId: "local-order-123", amountCents: 4700 },
+    )).rejects.toThrow("O provedor de pagamento retornou uma resposta inválida");
   });
 
   it("does not send the secret key to an unapproved API host", async () => {
@@ -109,6 +140,7 @@ describe("Pagar.me orders", () => {
       "https://sdx-api.pagar.me/core/v5/orders/or_123",
       expect.objectContaining({
         method: "GET",
+        redirect: "manual",
         headers: expect.objectContaining({ Authorization: "Basic c2tfdGVzdF9leGFtcGxlOg==" }),
       }),
     );
@@ -124,6 +156,7 @@ describe("Pagar.me orders", () => {
     const [url, options] = fetchSpy.mock.calls[0];
     expect(url).toBe("https://sdx-api.pagar.me/core/v5/orders?code=local+id%26x&size=30");
     expect(options?.method).toBe("GET");
+    expect(options?.redirect).toBe("manual");
   });
 
   it("accepts a list summary without charges and lets the caller fetch the full order", async () => {

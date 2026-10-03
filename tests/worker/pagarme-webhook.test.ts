@@ -88,6 +88,33 @@ describe("Pagar.me order.paid webhook", () => {
     expect(queueSend).toHaveBeenCalledExactlyOnceWith({ orderId: "order-123" });
   });
 
+  it("returns 500 to Pagar.me when its order API fails during a real Worker invocation", async () => {
+    const { env, queueSend } = createEnv();
+    const context = { waitUntil: vi.fn() };
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, { status: 503 }));
+
+    const response = await worker.fetch(notification(), env as never, context as never);
+
+    expect(response.status).toBe(500);
+    expect(queueSend).not.toHaveBeenCalled();
+    expect(context.waitUntil).not.toHaveBeenCalled();
+  });
+
+  it("returns 500 to Pagar.me when the paid order could not enter the queue", async () => {
+    const { env, queueSend } = createEnv();
+    const context = { waitUntil: vi.fn() };
+    queueSend.mockRejectedValue(new Error("Queue indisponível"));
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify(paidPixOrder), { status: 200 }),
+    );
+
+    const response = await worker.fetch(notification(), env as never, context as never);
+
+    expect(response.status).toBe(500);
+    expect(queueSend).toHaveBeenCalledOnce();
+    expect(context.waitUntil).not.toHaveBeenCalled();
+  });
+
   it("rejects an incorrect webhook token before querying the provider", async () => {
     const { env, queueSend } = createEnv();
     const fetchSpy = vi.spyOn(globalThis, "fetch");

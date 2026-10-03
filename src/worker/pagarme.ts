@@ -31,7 +31,18 @@ const ALLOWED_BASE_URLS = new Set([
   "https://api.pagar.me/core/v5",
   "https://sdx-api.pagar.me/core/v5",
 ]);
-const ALLOWED_CHECKOUT_HOSTS = new Set(["payment-link.pagar.me", "checkout.pagar.me"]);
+const ALLOWED_CHECKOUT_HOSTS = {
+  "https://api.pagar.me/core/v5": new Set([
+    "payment-link.pagar.me",
+    "payment-link-v3.pagar.me",
+    "checkout.pagar.me",
+  ]),
+  "https://sdx-api.pagar.me/core/v5": new Set([
+    "payment-link.pagar.me",
+    "payment-link-v3-sdx.pagar.me",
+    "checkout.pagar.me",
+  ]),
+};
 
 function baseUrl(env: Env): string {
   const base = env.PAGARME_BASE_URL?.replace(/\/$/, "");
@@ -61,12 +72,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function checkoutUrl(value: unknown): value is string {
+function checkoutUrl(value: unknown, base: string): value is string {
   if (typeof value !== "string") return false;
   try {
     const url = new URL(value);
     return url.protocol === "https:"
-      && ALLOWED_CHECKOUT_HOSTS.has(url.hostname)
+      && ALLOWED_CHECKOUT_HOSTS[base as keyof typeof ALLOWED_CHECKOUT_HOSTS].has(url.hostname)
       && !url.username
       && !url.password
       && !url.port;
@@ -113,7 +124,7 @@ export async function createPagarmePaymentLink(
 
   const response = await fetch(`${base}/paymentlinks`, {
     method: "POST",
-    redirect: "error",
+    redirect: "manual",
     headers: {
       ...headers(env),
       "Content-Type": "application/json",
@@ -126,7 +137,7 @@ export async function createPagarmePaymentLink(
       expires_in: 10_080,
       payment_settings: {
         accepted_payment_methods: ["pix"],
-        pix_settings: {},
+        pix_settings: { expires_in: 3_600 },
       },
       cart_settings: {
         items: [{ name: "Votos Perfeitos", amount: input.amountCents, default_quantity: 1 }],
@@ -139,7 +150,7 @@ export async function createPagarmePaymentLink(
   }
 
   const link = await readJson(response);
-  if (!isRecord(link) || typeof link.id !== "string" || !link.id || !checkoutUrl(link.url)) {
+  if (!isRecord(link) || typeof link.id !== "string" || !link.id || !checkoutUrl(link.url, base)) {
     throw new Error(INVALID_RESPONSE);
   }
   return { linkId: link.id, url: link.url };
@@ -150,7 +161,7 @@ export async function getPagarmeOrder(env: Env, providerOrderId: string): Promis
   if (!providerOrderId) throw new Error("Identificador de pedido inválido");
   const response = await fetch(`${base}/orders/${encodeURIComponent(providerOrderId)}`, {
     method: "GET",
-    redirect: "error",
+    redirect: "manual",
     headers: headers(env),
   });
   if (!response.ok) throw new Error("Não foi possível consultar o pagamento agora");
@@ -168,7 +179,7 @@ export async function listPagarmeOrdersByCode(env: Env, code: string): Promise<P
     if (page > 1) query.set("page", String(page));
     const response = await fetch(`${base}/orders?${query}`, {
       method: "GET",
-      redirect: "error",
+      redirect: "manual",
       headers: headers(env),
     });
     if (!response.ok) throw new Error("Não foi possível consultar o pagamento agora");

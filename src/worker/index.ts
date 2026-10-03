@@ -63,7 +63,7 @@ export default {
         return json({ error: "Método não permitido" }, 405);
       }
 
-      return handlePagarmeWebhook(request, env, context);
+      return handlePagarmeWebhook(request, env);
     }
 
     if (url.pathname === "/api/meta/config") {

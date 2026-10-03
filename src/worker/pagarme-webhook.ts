@@ -111,7 +111,6 @@ async function confirmPagarmeOrder(env: Env, orderId: string, providerOrderId: s
 export async function handlePagarmeWebhook(
   request: Request,
   env: Env,
-  context?: Pick<ExecutionContext, "waitUntil">,
 ): Promise<Response> {
   if (!env.PAGARME_WEBHOOK_TOKEN) return new Response(null, { status: 503 });
   if (!equalToken(new URL(request.url).searchParams.get("token"), env.PAGARME_WEBHOOK_TOKEN)) {
@@ -139,14 +138,8 @@ export async function handlePagarmeWebhook(
     return new Response(null, { status: 400 });
   }
 
-  const job = confirmPagarmeOrder(env, orderId, providerOrderId);
-  if (context) {
-    context.waitUntil(job);
-    return new Response(null, { status: 200 });
-  }
-
   try {
-    await job;
+    await confirmPagarmeOrder(env, orderId, providerOrderId);
     return new Response(null, { status: 200 });
   } catch {
     return new Response(null, { status: 500 });
