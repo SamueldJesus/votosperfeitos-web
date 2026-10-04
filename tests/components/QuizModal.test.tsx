@@ -53,7 +53,7 @@ describe("QuizModal", () => {
     const assign = stubNavigation();
 
     await completeQuiz(user);
-    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 47,00" }));
+    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 0,50" }));
 
     await waitFor(() => expect(assign).toHaveBeenCalledWith("https://checkout.pagar.me/pay/link-123"));
     expect(fetchSpy).toHaveBeenCalledWith("/api/checkout", expect.objectContaining({ method: "POST" }));
@@ -80,7 +80,7 @@ describe("QuizModal", () => {
     const assign = stubNavigation();
 
     await completeQuiz(user);
-    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 47,00" }));
+    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 0,50" }));
 
     expect(await screen.findByRole("alert")).not.toBeNull();
     expect(assign).not.toHaveBeenCalled();
@@ -96,7 +96,7 @@ describe("QuizModal", () => {
     const assign = stubNavigation();
 
     await completeQuiz(user);
-    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 47,00" }));
+    await user.click(screen.getByRole("button", { name: "Ir para o checkout Pix de R$ 0,50" }));
 
     expect(await screen.findByRole("alert")).not.toBeNull();
     expect(screen.getByText("Serviço de pagamento indisponível.")).not.toBeNull();

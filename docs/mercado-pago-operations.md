@@ -1,6 +1,6 @@
 # Mercado Pago — pedidos anteriores à troca de checkout
 
-Novas compras usam o checkout Pix hospedado do Pagar.me por R$ 47,00. Esta integração do Mercado Pago permanece apenas para confirmar e entregar pedidos criados antes da troca, inclusive aqueles que ainda estejam pendentes. Não crie novos checkouts do Mercado Pago.
+Novas compras usam o checkout Pix hospedado do Pagar.me por R$ 0,50 durante os testes reais. Esta integração do Mercado Pago permanece apenas para confirmar e entregar pedidos criados antes da troca, inclusive aqueles que ainda estejam pendentes. Não crie novos checkouts do Mercado Pago.
 
 Mantenha a notificação em **Suas integrações → Webhooks** no Mercado Pago enquanto houver pedidos legados pendentes:
 
