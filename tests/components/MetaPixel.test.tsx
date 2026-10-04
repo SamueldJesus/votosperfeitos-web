@@ -51,12 +51,12 @@ describe("MetaPixel", () => {
     expect(fbq).toHaveBeenCalledWith("track", "PageView", {}, expect.objectContaining({ eventID: expect.any(String) }));
   });
 
-  it("records the R$ 47 checkout value when checkout is created", () => {
+  it("records the R$ 0,50 checkout value when checkout is created", () => {
     const fbq = vi.fn();
     (window as Window & { fbq?: unknown }).fbq = fbq;
 
     trackInitiateCheckout({ eventId: "checkout-event-123" });
 
-    expect(fbq).toHaveBeenCalledWith("track", "InitiateCheckout", { value: 47, currency: "BRL" }, { eventID: "checkout-event-123" });
+    expect(fbq).toHaveBeenCalledWith("track", "InitiateCheckout", { value: 0.5, currency: "BRL" }, { eventID: "checkout-event-123" });
   });
 });

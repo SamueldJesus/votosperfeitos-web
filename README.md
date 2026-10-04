@@ -1,6 +1,6 @@
 # VotosPerfeitos
 
-Landing page e compra de três variações de votos de casamento. O comprador responde ao questionário e abre o checkout hospedado do Pagar.me para pagar **R$ 47,00 por Pix**. Após a confirmação do pagamento pelo Worker, a fila gera três PDFs e os envia por e-mail.
+Landing page e compra de três variações de votos de casamento. O comprador responde ao questionário e abre o checkout hospedado do Pagar.me para pagar **R$ 0,50 por Pix durante os testes reais**. Após a confirmação do pagamento pelo Worker, a fila gera três PDFs e os envia por e-mail.
 
 ## Desenvolvimento
 
@@ -64,7 +64,7 @@ Use `https://votosperfeitos.avancoai.com.br` como endereço público. A rota de 
 ## Teste do pagamento
 
 1. Em um ambiente de teste, use a chave `sk_test_...`, a base `https://sdx-api.pagar.me/core/v5` e um endpoint HTTPS de webhook de teste com seu próprio token.
-2. Gere um link de checkout e confira que ele oferece somente Pix por R$ 47,00. O comprador preenche os dados exigidos no checkout do Pagar.me.
+2. Gere um link de checkout e confira que ele oferece somente Pix por R$ 0,50. O comprador preenche os dados exigidos no checkout do Pagar.me.
 3. Conclua uma transação de sandbox e confira a notificação `order.paid`. O Worker deve consultar a API do Pagar.me antes de marcar o pedido como pago.
 4. Confira no D1 que o pedido passou a `sent`, na Queue que houve um trabalho e no e-mail que chegaram três PDFs. Reenvie a mesma notificação para verificar que não há entrega duplicada.
 5. No Resend, verifique o domínio usado em `EMAIL_FROM` para permitir e-mails a compradores fora da lista de teste.

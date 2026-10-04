@@ -70,7 +70,7 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toEqual({ error: "Dados do pedido são muito grandes" });
   });
 
-  it("creates a R$ 47,00 Pagar.me Pix checkout and returns its hosted URL", async () => {
+  it("creates a R$ 0,50 Pagar.me Pix checkout and returns its hosted URL", async () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-123");
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
@@ -96,7 +96,7 @@ describe("POST /api/checkout", () => {
         url: "https://payment-link.pagar.me/pl_123",
       },
     });
-    expect(statements[0]?.values).toContain(4700);
+    expect(statements[0]?.values).toContain(50);
     expect(statements[0]?.values).toContain("pending");
 
     expect(fetchSpy).toHaveBeenCalledOnce();
@@ -108,7 +108,7 @@ describe("POST /api/checkout", () => {
       order_code: "order-123",
       max_paid_sessions: 1,
       payment_settings: { accepted_payment_methods: ["pix"] },
-      cart_settings: { items: [{ amount: 4700, default_quantity: 1 }] },
+      cart_settings: { items: [{ amount: 50, default_quantity: 1 }] },
     });
     expect(statements.some((statement) => statement.sql.includes("pagarme_link_id"))).toBe(true);
   });

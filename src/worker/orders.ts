@@ -3,7 +3,7 @@ import { createPagarmePaymentLink, type PagarmePaymentLink } from "./pagarme";
 import { TONES, type CheckoutInput, type Tone } from "./types";
 import { parseMetaTracking, sendMetaEvent } from "./meta";
 
-export const ORDER_AMOUNT_CENTS = 4700;
+export const ORDER_AMOUNT_CENTS = 50;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const MAX_NARRATIVE_LENGTH = 4000;
